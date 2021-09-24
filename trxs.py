@@ -30,7 +30,7 @@ def xpath_parse(html):
     # 获取每个span的文本
     for each in urls:
         movie = each.attrib
-        filename = movie["download"].replace('/', ' ')   # 修复文件名存在"/"时候产生的问题
+        filename = movie["download"].replace('/', ' ').replace('|', ' ')   # 修复文件名存在"/"时候产生的问题
         href = movie["href"].strip("aa..")
         href = str("https://www.trxs123.com/e/DownSys") + str(href)
         # movie_list.append(movie)
