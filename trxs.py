@@ -39,6 +39,8 @@ def xpath_parse(html):
     return filename
 
 def download_file(filename,href):
+    session = requests.Session()
+    session.trust_env = False
     r = requests.get(href) 
     with open(filename,'wb') as fn:
         fn.write(r.content)
