@@ -79,6 +79,10 @@ if __name__ == '__main__':
             num = int(float(cent)/2)
             pre = '\r{}%:{}'.format(cent,'#'*num)
             print('{}:  正在准备中'.format(pre),end='',flush=True)
-            thing = get_item(i)
-            check_out(thing)
+            try:
+                thing = get_item(i)
+            except UnicodeEncodeError as error:
+                log(error+"\nID:"+i+"\n")
+            else:
+                check_out(thing)
 
