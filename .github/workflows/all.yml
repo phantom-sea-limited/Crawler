@@ -1,17 +1,17 @@
 name: ALL
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  # release:
-  #   types: [published]
   # push:
-  #   tags:
-  #   - 'v*'
-  # watch:
-  #   types: [started]
+  #   branches: [ main ]
+  # pull_request:
+  #   branches: [ main ]
+  release:
+    types: [published]
+  push:
+    tags:
+    - 'v*'
+  watch:
+    types: [started]
     
 jobs:
   build-win:
@@ -29,18 +29,18 @@ jobs:
         pip install flake8 pytest
     - name: sdk install
       run: |
-        pip install 
         pip install pypiwin32
         pip install pyinstaller
+        pip install lxml
+        pip install bs4
+        pip install requests
         rm -r -Force dist
         git config --global user.email 46920034+Rcrwrate@users.noreply.github.com
         git config --global user.name Rcrwrate
         git pull origin main
     - name: pyinstaller
       run: |
-        pyinstaller -F -i ./favicon.ico music.py
-        pyinstaller -F -i ./favicon.ico error.py
-        pyinstaller -F -i ./favicon.ico once.py
+        pyinstaller -F -i ./favicon.ico trxs.py
         
 #    - name: Commit and push
 #      run: bash reset.sh "update app config"
@@ -49,9 +49,7 @@ jobs:
       run: |
         rm -r -Force __pycache__
         rm -r -Force build
-        rm -Force music.spec
-        rm -Force once.spec
-        rm -Force error.spec
+        rm -Force trxs.spec
         git config --global user.email 46920034+Rcrwrate@users.noreply.github.com
         git config --global user.name Rcrwrate
         git add .
@@ -87,21 +85,19 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: sdk install
       run: |
-        pip install --upgrade tencentcloud-sdk-python
+        pip install lxml
+        pip install bs4
+        pip install requests
         pip install pyinstaller
     - name: pyinstaller
       run: |
-        pyinstaller -F -i=favicon.ico music.py -n=music
-        pyinstaller -F -i=favicon.ico error.py -n=error
-        pyinstaller -F -i=favicon.ico once.py -n=once
+        pyinstaller -F -i=favicon.ico trxs.py -n=trxs
     - name: Commit #上传新的refresh_token到仓库
       run: |
         rm -rf __pycache__
         rm -rf build
-        rm -f music.spec
-        rm -f once.spec
-        rm -f error.spec
-        git config --global user.email rurburner@gmail.com
+        rm -f trxs.spec
+        git config --global user.email 46920034+Rcrwrate@users.noreply.github.com
         git config --global user.name Rcrwrate
         git add .
         git commit -m "update new bulid" -a
