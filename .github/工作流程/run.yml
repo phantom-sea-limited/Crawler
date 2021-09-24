@@ -14,7 +14,7 @@ on:
     types: [started]
     
   
-  build-ubuntu:
+  create:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
