@@ -1,0 +1,115 @@
+name: ALL
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # release:
+  #   types: [published]
+  # push:
+  #   tags:
+  #   - 'v*'
+  # watch:
+  #   types: [started]
+    
+jobs:
+  build-win:
+    needs: build-ubuntu
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+    - name: sdk install
+      run: |
+        pip install 
+        pip install pypiwin32
+        pip install pyinstaller
+        rm -r -Force dist
+        git config --global user.email 46920034+Rcrwrate@users.noreply.github.com
+        git config --global user.name Rcrwrate
+        git pull origin main
+    - name: pyinstaller
+      run: |
+        pyinstaller -F -i ./favicon.ico music.py
+        pyinstaller -F -i ./favicon.ico error.py
+        pyinstaller -F -i ./favicon.ico once.py
+        
+#    - name: Commit and push
+#      run: bash reset.sh "update app config"
+        
+    - name: Commit #上传新的refresh_token到仓库
+      run: |
+        rm -r -Force __pycache__
+        rm -r -Force build
+        rm -Force music.spec
+        rm -Force once.spec
+        rm -Force error.spec
+        git config --global user.email 46920034+Rcrwrate@users.noreply.github.com
+        git config --global user.name Rcrwrate
+        git add .
+        git commit -m "update new bulid" -a
+        git remote rm origin
+        git remote add origin https://github.com/Rcrwrate/Crawler.git
+        git pull origin main
+        git push -u origin main
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+  
+  build-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: sdk install
+      run: |
+        pip install --upgrade tencentcloud-sdk-python
+        pip install pyinstaller
+    - name: pyinstaller
+      run: |
+        pyinstaller -F -i=favicon.ico music.py -n=music
+        pyinstaller -F -i=favicon.ico error.py -n=error
+        pyinstaller -F -i=favicon.ico once.py -n=once
+    - name: Commit #上传新的refresh_token到仓库
+      run: |
+        rm -rf __pycache__
+        rm -rf build
+        rm -f music.spec
+        rm -f once.spec
+        rm -f error.spec
+        git config --global user.email rurburner@gmail.com
+        git config --global user.name Rcrwrate
+        git add .
+        git commit -m "update new bulid" -a
+        git remote rm origin
+        git remote add origin https://github.com/Rcrwrate/Crawler.git
+        git pull origin main
+        git push -u origin main
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
