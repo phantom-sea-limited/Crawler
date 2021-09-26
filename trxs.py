@@ -33,7 +33,7 @@ def xpath_parse(html):
     for each in urls:
         movie = each.attrib
         filename = (
-            movie["download"].replace("/", " ").replace("|", " ")
+            movie["download"].replace("/", " ").replace("|", " ").replace("？", " ").replace("?", " ")
         )  # 修复文件名存在"/"时候产生的问题
         href = movie["href"].strip("aa..")
         href = str("https://www.trxs123.com/e/DownSys") + str(href)
@@ -96,7 +96,7 @@ if __name__ == "__main__":
                 print("\n文件名编码异常，请手动前往检查：ID：{}\n".format(i))
             except OSError as error:
                 log(str(error) + "\nID:" + str(i) + "\n")
-                print("\n文件名编码异常，请手动前往检查：ID：{}\n".format(i))
+                print("\n疑似文件名编码异常，请手动前往检查：ID：{}\n".format(i))
             except Exception as error:
                 log(str(error) + "\nID:" + str(i) + "\n")
                 print("\n未知异常：ID：{}\n".format(i))
