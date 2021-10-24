@@ -96,9 +96,8 @@ jobs:
         rm -rf __pycache__
         rm -rf build
         rm -f trxs.spec
-        rm -rf ubtuntu
         mv dist/ ubtuntu/
-        git config --global http.sslverify “false”
+        git config --global http.sslverify "false"
         git config --global user.email 46920034+Rcrwrate@users.noreply.github.com
         git config --global user.name Rcrwrate
         git add .
