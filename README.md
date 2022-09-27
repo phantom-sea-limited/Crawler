@@ -12,3 +12,9 @@
 针对[https://down.imwcr.com/1/main](https://down.imwcr.com/1/main)编写的爬虫
 
 IP记录:43.154.113.63
+
+## zxcs
+
+针对[http://zxcs.me/](http://zxcs.me/)编写的爬虫
+
+IP记录:92.242.62.123

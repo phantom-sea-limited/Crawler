@@ -63,7 +63,7 @@ class imwcr():
         self.forder = ["/"]
         while len(self.forder) != 0:
             wait = self.forder.pop(0)
-            r = self.dir(wait).json()
+            r = self.dir(wait,3).json()
             self.Filtering(r)
 
     def Filtering(self, r: json):
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     i.list_all()
     print(len(i.file))
     print(len(i.forder))
-    with open("imwcr.txt","w",encoding="utf-8") as f:
+    with open("imwcr3.txt","w",encoding="utf-8") as f:
         for j in i.file:
             f.write(j+"\n")
     # r = i.dir("/")
