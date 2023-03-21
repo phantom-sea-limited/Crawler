@@ -17,6 +17,10 @@
 
 通过`aria2c -c --input-file=url.txt`执行下载，或者使用IDM等软件进行下载
 
+#### 可以使用的示例网站
+
+- [https://jpxs123.com/](https://jpxs123.com/) IP记录:209.74.105.58
+
 ## imwcr[已失效]
 
 针对[https://down.imwcr.com/1/main](https://down.imwcr.com/1/main)编写的爬虫
