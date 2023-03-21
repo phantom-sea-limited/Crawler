@@ -1,16 +1,7 @@
 import json
-import logging
-import requests
-import ssl
 from urllib import parse
-ssl.HAS_SNI = False
-requests.packages.urllib3.disable_warnings()
+from Lib.Network import Network
 
-LOG = logging.getLogger("IMWCR")
-LOG.setLevel(logging.INFO)
-F = logging.FileHandler("imwcr.log", "a", encoding="utf-8")
-F.setFormatter(logging.Formatter('%(asctime)s:%(message)s'))
-LOG.addHandler(F)
 
 pro = {
     "http": None,
@@ -38,15 +29,14 @@ IP = "43.154.113.63"
 
 class imwcr():
     def __init__(self) -> None:
-        self.url = f"https://{IP}/"
-        self.s = requests.session()
+        self.url = f"https://down.imwcr.com/"
+        self.s = Network({"down.imwcr.com": {"ip": "43.154.113.63"}})
         self.s.trust_env = False
         self.s.keep_alive = False
 
     def get(self, path):
         URL = f"{self.url}{path}"
         r = self.s.get(url=URL, proxies=pro, headers=header, verify=False)
-        LOG.info(f"GET:\t{r.status_code}\t{self.url}{path}")
         return r
 
     def dir(self, path, drive=1):
