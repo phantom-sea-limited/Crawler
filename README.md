@@ -20,6 +20,7 @@
 #### 可以使用的示例网站
 
 - [https://jpxs123.com/](https://jpxs123.com/) IP记录:209.74.105.58
+- [https://tongrenquan.org/](https://tongrenquan.org/) IP记录:199.33.126.51
 
 ## imwcr[已失效]
 
