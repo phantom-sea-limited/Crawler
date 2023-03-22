@@ -89,9 +89,9 @@ class template():
 
 
 if __name__ == "__main__":
-    # t = template("jpxs123.com", "209.74.105.58")
-    # fin = t.get_url(3643)
-    # print(fin)
-    # t.run(1500, 2000)
-    t = template(args.domain, args.ip, args.protocal)
-    t.run(args.start, args.end)
+    print(args)
+    if args.domain == None:
+        print("missing key domain")
+    else:
+        t = template(args.domain, args.ip, args.protocal)
+        t.run(args.start, args.end)

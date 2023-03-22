@@ -7,3 +7,5 @@ __pycache__/
 test*
 
 txt
+
+*.pem
