@@ -2,11 +2,15 @@ import argparse
 import os
 import re
 import time
+import json
 # from bs4 import BeautifulSoup
 from Lib.Network import Network
+from Lib.ini import CONF
 
 if not os.path.exists("txt"):
     os.mkdir("txt")
+if not os.path.exists("Data"):
+    os.mkdir("Data")
 
 parser = argparse.ArgumentParser(
     prog="Book Downloader",
@@ -56,6 +60,7 @@ class Static:
 class template():
     def __init__(self, domain, ip=False, protocal="https://") -> None:
         self.s = Network({domain: {"ip": ip}})
+        self.c = CONF(domain, conf_path="Data")
         self.url = protocal + domain
 
     def get(self, path):
@@ -76,15 +81,27 @@ class template():
 
     def run(self, start=0, end=5000):
         F = open(os.path.join("txt", "url.txt"), "w")
+        ID_list = self.c.load("Core", "ID")[0]
+        if ID_list == False:
+            ID_list = []
+        else:
+            ID_list = json.loads(ID_list)
         while start <= end:
             try:
                 fin = self.get_url(start)
             except:
-                print(start+"出现问题，请手动校对")
+                print(str(start)+"出现问题，请手动校对")
             if fin != False:
-                F.write(self.url + "/e/DownSys/" + fin["href"].split("/")[1])
+                url = self.url + "/e/DownSys/" + fin["href"].split("/")[1]
+                F.write(url)
                 F.write("\n\tout=" + fin["download"] + "\n")
+                if start not in ID_list:
+                    ID_list.append(start)
+                self.c.add(start, "Download", url)
+                self.c.add(start, "Filename", fin["download"])
             start += 1
+        self.c.add("Core", "ID", ID_list)
+        self.c.save()
         F.close()
 
 
