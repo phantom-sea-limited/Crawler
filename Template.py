@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-d', '--domain', type=str, help='网站域名')
 parser.add_argument("-p", "--protocal",  type=str,
                     help='网站支持协议', default="https://")
-parser.add_argument("-i", "--ip", type=str, help='网站IP地址', default=False)
+parser.add_argument("-i", "--ip", type=str, help='网站IP地址', default='False')
 parser.add_argument("-s", "--start", type=int, help="起始点", default=0)
 parser.add_argument("-e", "--end", type=int, help="终止点", default=10000)
 parser.add_argument("-m", "--mode", type=str, help="模式", default="default")
@@ -59,7 +59,9 @@ class Static:
 
 
 class template():
-    def __init__(self, domain, ip=False, protocal="https://") -> None:
+    def __init__(self, domain, ip="False", protocal="https://") -> None:
+        if ip == "False":
+            ip = False  # 为github action作出妥协
         self.s = Network({domain: {"ip": ip}})
         self.c = CONF(domain, conf_path="Data")
         self.url = protocal + domain

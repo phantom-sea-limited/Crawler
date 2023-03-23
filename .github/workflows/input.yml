@@ -16,9 +16,9 @@ on:
         - 'http://'
       IP:
         description: '网站IP地址'
-        required: false
+        required: true
         type: string
-        default: false
+        default: 'False'
       START:
         description: '起始点'
         required: true
@@ -44,11 +44,6 @@ jobs:
     - name: Create Conf
       run: |
         python Template.py -d ${{ inputs.DOMAIN }} -p ${{ inputs.PROTOCAL }} -i ${{ inputs.IP }} -s ${{ inputs.START }} -e ${{ inputs.END }}
-  
-    - name: Clean
-      run: |
-        rm -rf image
-        python C.py --public "${{ secrets.PUBLIC }}" --private "${{ secrets.PRIVATE }}" --mode jiami
 
     - name: Push
       run: |
