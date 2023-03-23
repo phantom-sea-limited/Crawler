@@ -29,6 +29,15 @@ on:
         required: true
         type: number
         default: 10000
+      ENCODE:
+        description: '网站编码'
+        required: true
+        default: 'gbk'
+        type: choice
+        options:
+        - 'gbk'
+        - 'utf-8'
+        - 'gb2312'
       X:
         description: '高级设置'
         required: true
@@ -48,7 +57,7 @@ jobs:
         
     - name: Create Conf
       run: |
-        python Template.py -d ${{ inputs.DOMAIN }} -p ${{ inputs.PROTOCAL }} -i ${{ inputs.IP }} -s ${{ inputs.START }} -e ${{ inputs.END }} -x ${{ inputs.X }}
+        python Template.py -d ${{ inputs.DOMAIN }} -p ${{ inputs.PROTOCAL }} -i ${{ inputs.IP }} -s ${{ inputs.START }} -e ${{ inputs.END }} -c ${{ inputs.ENCODE }} -x ${{ inputs.X }}
 
     - name: Push
       run: |

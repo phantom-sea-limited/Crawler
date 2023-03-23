@@ -24,6 +24,7 @@ parser.add_argument("-i", "--ip", type=str, help='网站IP地址', default='Fals
 parser.add_argument("-s", "--start", type=int, help="起始点", default=0)
 parser.add_argument("-e", "--end", type=int, help="终止点", default=10000)
 parser.add_argument("-m", "--mode", type=str, help="模式", default="default")
+parser.add_argument("-c", "--code", type=str, help="网页编码", default="gbk")
 parser.add_argument("-x", "--x", type=str, help="高级设定", default="/txt/2")
 
 args = parser.parse_args()
@@ -38,6 +39,17 @@ class Static:
         for i in r:
             t = i.split("=")[0]
             fin[t] = i.replace(t+"=", "").replace("\"", "")
+        return fin
+
+    @staticmethod
+    def rematch_test(text):
+        r = re.findall(
+            r'''</a> <a([\s\S]+?)>txt下载</a>''',  text)[0]
+        r = re.findall(r''' ([\s\S]+?=\"[\s\S]+?)\"''', r)
+        fin = {}
+        for i in r:
+            t = i.split("=")[0]
+            fin[t] = i.replace(t+"=", "").replace("\"", "").replace(" ", "")
         return fin
 
     # @staticmethod #不搞这个了，麻烦
@@ -60,19 +72,21 @@ class Static:
 
 
 class template():
-    def __init__(self, domain, ip="False", protocal="https://", path="/txt/2") -> None:
+    def __init__(self, domain, ip="False", protocal="https://", path="/txt/2", encoding="gbk") -> None:
         if ip == "False":
             ip = False  # 为github action作出妥协
         self.s = Network({domain: {"ip": ip}})
         self.c = CONF(domain, conf_path="Data")
         self.url = protocal + domain
         self.download = path
+        self.encoding = encoding
 
     def get(self, path):
         return self.s.get(self.url+path)
 
-    def get_url(self, ID, method=Static.rematch, tryid=0):
+    def get_url(self, ID, method=Static.rematch_test, tryid=0):
         r = self.get(f"{self.download}-{ID}-0.html")
+        r.encoding = self.encoding
         if r.status_code != 200:
             if tryid >= 3:
                 raise Exception("ERROR")
@@ -115,7 +129,7 @@ class template():
                     if start not in ID_list:
                         ID_list.append(start)
                     self.c.add(str(start), "Download", url)
-                    self.c.add(str(start), "Filename", fin["download"])
+                    self.c.add(str(start), "Filename", fin["download"].replace("/","&"))
             start += 1
         self.c.add("Core", "ID", ID_list)
         self.c.add("Core", "Error", ERR_list)
@@ -138,7 +152,7 @@ if __name__ == "__main__":
     if args.domain == None:
         print("missing key domain")
     else:
-        t = template(args.domain, args.ip, args.protocal, args.x)
+        t = template(args.domain, args.ip, args.protocal, args.x, args.code)
         if args.mode == "default":
             t.run(args.start, args.end)
         elif args.mode == "local":

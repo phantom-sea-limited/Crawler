@@ -50,6 +50,17 @@ jobs:
         rm -rf txt
         python C.py --public "${{ secrets.PUBLIC }}" --private "${{ secrets.PRIVATE }}" --mode jiami
 
+
+    - name: Debug Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: Upload-log
+        path: |
+          wait.log
+          Upload/command.log
+          Upload/upload.log
+
+
     - name: Push
       run: |
         git init
@@ -60,13 +71,3 @@ jobs:
         git checkout -- Upload/oa.json
         git filter-branch --force --index-filter 'if [ "$GIT_COMMIT" != "$(git rev-parse HEAD)" ]; then git rm --cached --ignore-unmatch Upload/setting.py; fi' --prune-empty --tag-name-filter cat -- --all
         git push origin --force --all
-
-    # - name: Deploy
-    #   uses: JamesIves/github-pages-deploy-action@3.7.1
-    #   with:
-    #     BRANCH: main
-    #     FOLDER: .
-    #     BASE_BRANCH: main
-                
-                
-                
