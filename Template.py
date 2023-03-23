@@ -23,6 +23,7 @@ parser.add_argument("-p", "--protocal",  type=str,
 parser.add_argument("-i", "--ip", type=str, help='网站IP地址', default=False)
 parser.add_argument("-s", "--start", type=int, help="起始点", default=0)
 parser.add_argument("-e", "--end", type=int, help="终止点", default=10000)
+parser.add_argument("-m", "--mode", type=str, help="模式", default="default")
 
 args = parser.parse_args()
 
@@ -104,6 +105,16 @@ class template():
         self.c.save()
         F.close()
 
+    def run_local(self):
+        ID_list = self.c.load("Core", "ID")[0]
+        if ID_list == False:
+            print("未发现有效配置文件，请手动生成")
+        ID_list = json.loads(ID_list)
+        with open(os.path.join("txt", "url.txt"), "w") as f:
+            for i in ID_list:
+                f.write(self.c.load(str(i), "download")[0])
+                f.write("\n\tout=" + self.c.load(str(i), "filename")[0] + "\n")
+
 
 if __name__ == "__main__":
     print(args)
@@ -111,4 +122,7 @@ if __name__ == "__main__":
         print("missing key domain")
     else:
         t = template(args.domain, args.ip, args.protocal)
-        t.run(args.start, args.end)
+        if args.mode == "default":
+            t.run(args.start, args.end)
+        elif args.mode == "local":
+            t.run_local()

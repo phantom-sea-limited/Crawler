@@ -1,0 +1,60 @@
+name: Input
+on:
+  workflow_dispatch:
+    inputs:
+      DOMAIN:
+        description: '网站域名'
+        required: true
+        type: string
+      PROTOCAL:
+        description: '网站支持协议'
+        required: true
+        default: 'https://'
+        type: choice
+        options:
+        - 'https://'
+        - 'http://'
+      IP:
+        description: '网站IP地址'
+        required: false
+        type: string
+        default: false
+      START:
+        description: '起始点'
+        required: true
+        type: number
+        default: 0
+      END:
+        description: '终止点'
+        required: true
+        type: number
+        default: 10000
+    
+jobs:
+  main:
+    runs-on: ubuntu-latest
+        
+    steps:                          
+    - name: checkout main
+      uses: actions/checkout@v2
+      with:
+        ref: main
+        fetch-depth: full
+        
+    - name: Create Conf
+      run: |
+        python Template.py -d ${{ inputs.DOMAIN }} -p ${{ inputs.PROTOCAL }} -i ${{ inputs.IP }} -s ${{ inputs.START }} -e ${{ inputs.END }}
+  
+    - name: Clean
+      run: |
+        rm -rf image
+        python C.py --public "${{ secrets.PUBLIC }}" --private "${{ secrets.PRIVATE }}" --mode jiami
+
+    - name: Push
+      run: |
+        git init
+        git config user.name Rcrwrate
+        git config user.email 46920034+Rcrwrate@users.noreply.github.com
+        git add Data/*
+        git commit -m "Data update ${{ github.run_id }}"
+        git push
