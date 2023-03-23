@@ -1,0 +1,72 @@
+name: Download and Upload
+on:
+  workflow_dispatch:
+    inputs:
+      DOMAIN:
+        description: '网站域名'
+        required: true
+        type: string
+      Upload:
+        description: '上传路径'
+        required: true
+        type: string
+        default: '幻海图书馆/0.爬虫'
+  # schedule:
+  #   - cron: '0 21 * * *'
+    
+jobs:
+  Run:
+    runs-on: ubuntu-latest
+        
+    steps:                          
+    - name: checkout main
+      uses: actions/checkout@v2
+      with:
+        ref: main
+        fetch-depth: full
+               
+    - name: Prepare
+      run: |
+        pip install pycryptodome
+        sudo apt update
+        sudo apt install -y -qq aria2
+        python C.py --public "${{ secrets.PUBLIC }}" --private "${{ secrets.PRIVATE }}" --mode jiemi
+        
+    - name: Download
+      run: |
+        python Template.py -d ${{ inputs.DOMAIN }} -m local
+        cd txt
+        aria2c -c --input-file=url.txt
+        rm -rf url.txt
+        
+    
+    - name: Upload
+      run: |
+        cd Upload
+        python run.py -p ${{ inputs.Upload }}
+
+    - name: Clean
+      run: |
+        rm -rf txt
+        python C.py --public "${{ secrets.PUBLIC }}" --private "${{ secrets.PRIVATE }}" --mode jiami
+
+    - name: Push
+      run: |
+        git init
+        git config user.name Rcrwrate
+        git config user.email 46920034+Rcrwrate@users.noreply.github.com
+        git add Upload/setting.py
+        git commit -m "Run update ${{ github.run_id }}"
+        git checkout -- Upload/oa.json
+        git filter-branch --force --index-filter 'if [ "$GIT_COMMIT" != "$(git rev-parse HEAD)" ]; then git rm --cached --ignore-unmatch Upload/setting.py; fi' --prune-empty --tag-name-filter cat -- --all
+        git push origin --force --all
+
+    # - name: Deploy
+    #   uses: JamesIves/github-pages-deploy-action@3.7.1
+    #   with:
+    #     BRANCH: main
+    #     FOLDER: .
+    #     BASE_BRANCH: main
+                
+                
+                

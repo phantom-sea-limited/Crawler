@@ -1,4 +1,4 @@
-name: Input
+name: Create Conf
 on:
   workflow_dispatch:
     inputs:
@@ -29,6 +29,11 @@ on:
         required: true
         type: number
         default: 10000
+      X:
+        description: '高级设置'
+        required: true
+        type: string
+        default: "/txt/2"
     
 jobs:
   main:
@@ -43,7 +48,7 @@ jobs:
         
     - name: Create Conf
       run: |
-        python Template.py -d ${{ inputs.DOMAIN }} -p ${{ inputs.PROTOCAL }} -i ${{ inputs.IP }} -s ${{ inputs.START }} -e ${{ inputs.END }}
+        python Template.py -d ${{ inputs.DOMAIN }} -p ${{ inputs.PROTOCAL }} -i ${{ inputs.IP }} -s ${{ inputs.START }} -e ${{ inputs.END }} -x ${{ inputs.X }}
 
     - name: Push
       run: |

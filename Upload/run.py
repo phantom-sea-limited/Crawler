@@ -8,10 +8,10 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument('-p', '--path', type=str,
-                    dest="path", help='上传路径', default="Upload/Pixiv/image")
+                    dest="path", help='上传路径', default="幻海图书馆/0.爬虫")
 
 args = parser.parse_args()
 
 
-if args.path.startswith("Upload/Pixiv"):
-    main("../image", args.path.replace("\r",""))
+if args.path.startswith("幻海图书馆/0.爬虫"):
+    main("../txt", args.path.replace("\r",""))

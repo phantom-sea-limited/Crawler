@@ -24,6 +24,7 @@ parser.add_argument("-i", "--ip", type=str, help='网站IP地址', default='Fals
 parser.add_argument("-s", "--start", type=int, help="起始点", default=0)
 parser.add_argument("-e", "--end", type=int, help="终止点", default=10000)
 parser.add_argument("-m", "--mode", type=str, help="模式", default="default")
+parser.add_argument("-x", "--x", type=str, help="高级设定", default="/txt/2")
 
 args = parser.parse_args()
 
@@ -59,18 +60,19 @@ class Static:
 
 
 class template():
-    def __init__(self, domain, ip="False", protocal="https://") -> None:
+    def __init__(self, domain, ip="False", protocal="https://", path="/txt/2") -> None:
         if ip == "False":
             ip = False  # 为github action作出妥协
         self.s = Network({domain: {"ip": ip}})
         self.c = CONF(domain, conf_path="Data")
         self.url = protocal + domain
+        self.download = path
 
     def get(self, path):
         return self.s.get(self.url+path)
 
     def get_url(self, ID, method=Static.rematch, tryid=0):
-        r = self.get(f"/txt/2-{ID}-0.html")
+        r = self.get(f"{self.download}-{ID}-0.html")
         if r.status_code != 200:
             if tryid >= 3:
                 raise Exception("ERROR")
@@ -136,7 +138,7 @@ if __name__ == "__main__":
     if args.domain == None:
         print("missing key domain")
     else:
-        t = template(args.domain, args.ip, args.protocal)
+        t = template(args.domain, args.ip, args.protocal, args.x)
         if args.mode == "default":
             t.run(args.start, args.end)
         elif args.mode == "local":

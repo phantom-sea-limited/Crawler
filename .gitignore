@@ -9,3 +9,5 @@ test*
 txt
 
 *.pem
+
+*.log
