@@ -82,6 +82,10 @@ class template():
         except Exception:
             return False
 
+    def get_ori_url(self, url):
+        r = self.s.get(url, allow_redirects=False)
+        return self.url + r.headers["Location"]
+
     def run(self, start=0, end=5000):
         F = open(os.path.join("txt", "url.txt"), "w")
         ID_list = self.c.load("Core", "ID")[0]
@@ -89,21 +93,30 @@ class template():
             ID_list = []
         else:
             ID_list = json.loads(ID_list)
+        ERR_list = self.c.load("Core", "Error")[0]
+        if ERR_list == False:
+            ERR_list = []
+        else:
+            ERR_list = json.loads(ERR_list)
         while start <= end:
             try:
                 fin = self.get_url(start)
             except:
                 print(str(start)+"出现问题，请手动校对")
-            if fin != False:
-                url = self.url + "/e/DownSys/" + fin["href"].split("/")[1]
-                F.write(url)
-                F.write("\n\tout=" + fin["download"] + "\n")
-                if start not in ID_list:
-                    ID_list.append(start)
-                self.c.add(start, "Download", url)
-                self.c.add(start, "Filename", fin["download"])
+                ERR_list.append(start)
+            else:
+                if fin != False:
+                    url = self.url + "/e/DownSys/" + fin["href"].split("/")[1]
+                    url = self.get_ori_url(url)
+                    F.write(url)
+                    F.write("\n\tout=" + fin["download"] + "\n")
+                    if start not in ID_list:
+                        ID_list.append(start)
+                    self.c.add(str(start), "Download", url)
+                    self.c.add(str(start), "Filename", fin["download"])
             start += 1
         self.c.add("Core", "ID", ID_list)
+        self.c.add("Core", "Error", ERR_list)
         self.c.save()
         F.close()
 
