@@ -39,8 +39,11 @@ Phantom-sea © limited |∀` )
 #### 可以使用的示例网站
 
 - [https://jpxs123.com/](https://jpxs123.com/) </br>IP记录:209.74.105.58
+
 - [https://tongrenquan.org/](https://tongrenquan.org/) </br>IP记录:199.33.126.50-54
-- [https://www.bixiange.top](https://www.bixiange.top) </br>IP记录:无(安全意识强,尚未发现)
+
+- [https://www.bixiange.top](https://www.bixiange.top) </br>IP记录:无(安全意识强,尚未发现)</br>不过内容和[https://m.bixiange.me/](https://m.bixiange.me/)完全一致
+
 - [https://m.bixiange.me/](https://m.bixiange.me/) </br>IP记录:209.74.107.162/209.74.107.163/209.74.107.165
 
 
