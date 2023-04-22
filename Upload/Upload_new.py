@@ -23,8 +23,8 @@ class Upload():
         self.err = 0
 
     @staticmethod
-    def change_name(filename):
-        for i in [":", "\"", "*", ":", "<", ">", "?", "/", "\\", "|", "。"]:
+    def change_name(filename): # FIX.md.1
+        for i in [":", "\"", "*", ":", "<", ">", "?", "/", "\\", "|", "。", "#"]:
             filename = filename.replace(i, "")
         return filename
 
