@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    https://zh.nhimmeo.cf/
-// @version      1.0
+// @version      1.1
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -284,6 +284,7 @@ function add_button() {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]
             var A = new Article(IDs)
+            A.init()
         }
         $(".box-colored")[0].append(button)
     }
