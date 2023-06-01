@@ -56,6 +56,7 @@ class Article {
         if (document.location.href == `https://zh.nhimmeo.cf/book/${this.ID}/catalog/`) {
             var all = $(".collapsible")
             var i = 0
+            var oldchaperList = [...this.chapterList]
             this.chapterList = []
             while (i < all.length) {
                 var catalog = { "name": all[i].innerText.split("\n")[1], "lists": [] }
@@ -97,7 +98,6 @@ class Article {
             window.Task_STOP = true
             document.location.href = chap.href
         }
-
     }
 
     PrefetchChapter() {

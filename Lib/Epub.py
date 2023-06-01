@@ -55,6 +55,7 @@ class Epub():
                         with open(path, "wb") as f:
                             f.write(r.content)
                         self.piclist.append(url)
+                        break
                 except:
                     import traceback
                     print(traceback.format_exc())
@@ -65,6 +66,8 @@ class Epub():
                     else:
                         print(f'''[TIPS]:您需要手动下载该文件置于{path}''')
                         break
+        else:
+            self.piclist.append(url)
 
     def cover(self, url, describe):
         with open(os.path.join(self.out_path, self.name, "OEBPS", "Text", "cover.xhtml"), "w", encoding="utf-8") as f:
@@ -133,8 +136,14 @@ text = [{
                     elif i["type"] == "html":
                         f.write(f'''{i["item"]}\n''')
                     else:
-                        f.write(f'''<{i["type"]}>　　{i["item"]}</{i["type"]}>\n''')
+                        f.write(
+                            f'''<{i["type"]}>　　{i["item"]}</{i["type"]}>\n''')
                 f.write("</body></html>")
+            self.list.append({
+                "Uid": text["Uid"],
+                "url": f'Text/{text["Uid"]}.xhtml',
+                "title": text["title"]
+            })
 
         for i in texts:
             add_single_text(i)
@@ -159,10 +168,13 @@ text = [{
 </docAuthor>
 <navMap>\n''')
             i = 1
-            while i <= len(self.list):
+            # while i <= len(self.list):
+            #     f.write(
+            #         f'''<navPoint id="{self.list[i-1]["Uid"]}" playOrder="{i}"><navLabel><text>{self.list[i-1]["title"]}</text></navLabel><content src="{self.list[i-1]["url"]}" /></navPoint>\n''')
+            #     i += 1
+            for j in self.list:
                 f.write(
-                    f'''<navPoint id="{self.list[i-1]["Uid"]}" playOrder="{i}"><navLabel><text>{self.list[i-1]["title"]}</text></navLabel><content src="{self.list[i-1]["url"]}" /></navPoint>\n''')
-                i += 1
+                    f'''<navPoint id="{j["Uid"]}" playOrder="{i}"><navLabel><text>{j["title"]}</text></navLabel><content src="{j["url"]}" /></navPoint>\n''')
             f.write("</navMap>\n</ncx>\n")
         with open(f".tmp/{self.name}/OEBPS/content.opf", "w", encoding="utf-8") as f:
             f.write(f'''<?xml version="1.0" encoding="utf-8" standalone="yes"?>

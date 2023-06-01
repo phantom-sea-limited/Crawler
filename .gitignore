@@ -11,3 +11,5 @@ txt
 *.pem
 
 *.log
+
+*.json

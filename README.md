@@ -6,6 +6,8 @@
 ### 相关文件
 
 > nhimmeo.user.js
+>
+> nhimmeo.py
 
 **使用说明**
 
