@@ -20,8 +20,8 @@ header = {
     "accept": "application/json, text/plain, */*",
     "accept-encoding": "utf-8",
     "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
-    "host": "down.imwcr.com",
-    "referer": "https://down.imwcr.com/1/main/"
+    "host": "down.suucc.com",
+    "referer": "https://down.suucc.com/1/main/"
 }
 
 IP = "43.154.113.63"
@@ -29,8 +29,8 @@ IP = "43.154.113.63"
 
 class imwcr():
     def __init__(self) -> None:
-        self.url = f"https://down.imwcr.com/"
-        self.s = Network({"down.imwcr.com": {"ip": "43.154.113.63"}})
+        self.url = f"https://down.suucc.com/"
+        self.s = Network({"down.suucc.com": {"ip": "43.154.113.63"}})
         self.s.trust_env = False
         self.s.keep_alive = False
 

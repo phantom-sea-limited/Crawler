@@ -1,8 +1,25 @@
 # Crawler
 
-## 同人小说(通用)
+
+## **nhimmeo.cf 刺猬猫分享**[未完工]
+
+### 相关文件
+
+> nhimmeo.user.js
+
+**使用说明**
+
+请使用[Tampermonkey](https://www.tampermonkey.net/)安装此用户脚本
+
+[**点击安装脚本**](https://github.com/phantom-sea-limited/Crawler/raw/main/nhimmeo.user.js)
+
+## **同人小说(通用)**
 
 大部分同人网站那源码都一样的东西，做了个模板，可以直接爬
+
+### 相关文件
+
+> Template.py
 
 **使用说明**
 ```
@@ -47,14 +64,22 @@ Phantom-sea © limited |∀` )
 - [https://m.bixiange.me/](https://m.bixiange.me/) </br>IP记录:209.74.107.162/209.74.107.163/209.74.107.165
 
 
-## trxs(原版)[已失效]
+## **trxs(原版)[已失效]**
+
+### 相关文件
+
+> trxs.py
 
 前不久看见个同人小说的网站，写了个爬虫爬着玩
 这里是小说[网站地址](https://www.trxs123.com)
 
 ~~编译完成之后的程序[在这下载](https://github.com/Rcrwrate/Crawler/tree/main/dist)~~
 
-## imwcr[已失效]
+## **imwcr**
+
+### 相关文件
+
+> imwcr.py
 
 针对[https://down.imwcr.com/1/main](https://down.imwcr.com/1/main)编写的爬虫
 
@@ -64,7 +89,15 @@ IP记录:43.154.113.63
 
 根据这个IP记录，发现了新的域名，但是502，先记录 down.suucc.com
 
-## zxcs
+#### 恢复正常 2023.6.1
+
+实际上只是拥有者更换域名而已，功能还未测试，应该差不多改改就行
+
+## **zxcs**
+
+### 相关文件
+ 
+> zxcs.py
 
 针对[http://zxcs.me/](http://zxcs.me/)编写的爬虫
 
