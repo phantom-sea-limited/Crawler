@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    https://zh.nhimmeo.cf/
-// @version      1.1
+// @version      1.2
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -41,7 +41,8 @@ class Article {
         setTimeout(Task.init, 200)
     }
 
-    reinit() {
+    async reinit() {
+        await this.load()
         if (this.init_status != true) {
             Task.add(
                 [
@@ -251,6 +252,7 @@ class Task {
     }
 
     static init() {
+        window.Task_info = Task.localconfig()
         var commands = window.Task_info
         var command;
         if (commands != null) {
@@ -294,34 +296,90 @@ function check_Task_status() {
     }
 }
 
-
+function add_task_status() {
+    var l = Task.localconfig().length
+    if (l != 0) { msg = `任务剩余${l}` }
+    else { msg = "任务已完成"; window.add_task_status = 0 }
+    var a = $(".fa-coffee")[0]
+    // a.nextElementSibling.href = null
+    a.nextElementSibling.innerText = msg
+    setTimeout(add_task_status, 2000)
+}
 
 
 function add_button() {
     var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
     if (IDs != null) {
         IDs = IDs[1]
-
-        var button = document.createElement("button")
-        button.classList.add("inverse")
-        button.classList.add("shadowed")
-        button.classList.add("small")
-        var button_a = document.createElement("a")
-        button_a.classList.add("color_white")
-        var button_i = document.createElement("i")
-        button_i.classList.add("fa")
-        button_i.classList.add("fa-download")
-        button_i.ariaHidden = true
-        button_a.append(button_i)
-        button_a.append("下载")
-        button.append(button_a)
-        button.onclick = function () {
+        var main = $(".box-colored")[0]
+        function create(msg, icon, func, colored = "inverse") {
+            var button = document.createElement("button")
+            button.classList.add(colored)
+            button.classList.add("shadowed")
+            button.classList.add("small")
+            var button_a = document.createElement("a")
+            button_a.classList.add("color_white")
+            var button_i = document.createElement("i")
+            button_i.classList.add("fa")
+            button_i.classList.add(icon)
+            button_i.ariaHidden = true
+            button_a.append(button_i)
+            button_a.append(msg)
+            button.append(button_a)
+            button.onclick = func
+            return button
+        }
+        main.append(create("下载(高效)", "fa-download", function () {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]
             var A = new Article(IDs)
             A.reinit()
-        }
-        $(".box-colored")[0].append(button)
+        }))
+        main.append(document.createElement("br"))
+        main.append(create("下载(稳定)", "fa-download", function () {
+            var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
+            IDs = IDs[1]
+            var A = new Article(IDs, "async")
+            A.reinit()
+        }))
+        main.append(document.createElement("br"))
+        main.append(create("修复下载/继续章节(高速)", "fa-download", function () {
+            var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
+            IDs = IDs[1]
+            var A = new Article(IDs)
+            A.PrefetchChapter().then(res => { Task.init() })
+        }))
+        main.append(document.createElement("br"))
+        main.append(create("修复下载/继续章节(稳定)", "fa-download", function () {
+            var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
+            IDs = IDs[1]
+            var A = new Article(IDs, "async")
+            A.PrefetchChapter().then(res => { Task.init() })
+        }))
+        main.append(document.createElement("br"))
+        main.append(create("手动导出(高速)", "fa-floppy-o", function () {
+            var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
+            IDs = IDs[1]
+            var A = new Article(IDs)
+            A.file()
+        }))
+        main.append(document.createElement("br"))
+        main.append(create("手动导出(稳定)", "fa-floppy-o", function () {
+            var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
+            IDs = IDs[1]
+            var A = new Article(IDs, "async")
+            A.file()
+        }))
+        main.append(document.createElement("br"))
+        main.append(create("清空高速缓存", "fa-times", function () {
+            localStorage.clear()
+        }, "secondary"))
+        main.append(document.createElement("br"))
+        main.append(create("清空稳定缓存", "fa-times", function () {
+            localforage.clear()
+        }, "secondary"))
+    } else {
+        setTimeout(add_task_status)
     }
 }
 
