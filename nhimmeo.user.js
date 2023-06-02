@@ -5,6 +5,7 @@
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
+// @require      https://static.deception.world/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=nhimmeo.cf
 // @grant        none
 // ==/UserScript==
@@ -18,12 +19,14 @@ class Article {
     author = null;
     tag = null;
     chapterList = [];
+    init_status = false;
     constructor(ID) {
         this.ID = ID;
         this.load();
     }
 
     init() {
+        this.init_status = true
         Task.add(
             [
                 Task.createBymethod(this.ID, "fetchInfo"),
@@ -36,6 +39,18 @@ class Article {
         Task.init()
     }
 
+    reinit() {
+        if (this.init_status != true) {
+            Task.add(
+                [
+                    Task.createBymethod(this.ID, "fetchInfo"),
+                    Task.createBymethod(this.ID, "fetchCatalog"),
+                    Task.createBymethod(this.ID, "PrefetchChapter"),
+                    Task.createBymethod(this.ID, "file"),
+                ]
+            )
+        }
+    }
 
     fetchInfo() {
         if (document.location.href == 'https://zh.nhimmeo.cf/book/' + this.ID) {
@@ -140,7 +155,7 @@ class Article {
     }
 
     load() {
-        var tmp = this.localconfig(this.ID);
+        var tmp = Article.localconfig(this.ID);
         if (tmp != null) {
             // function s(one, two) {
             //     try { one = two } catch { }
@@ -162,14 +177,23 @@ class Article {
     }
 
     save() {
-        this.localconfig(this.ID, this.output())
+        Article.localconfig(this.ID, this.output())
     }
 
-    localconfig(key, msg = '') {
+    static localconfig(key, msg = '') {
         if (msg === '') {
             return JSON.parse(localStorage.getItem(key));
         } else {
             return localStorage.setItem(key, JSON.stringify(msg))
+        }
+    }
+
+    static async localforge(key, msg = "") {
+        var localforge = window.localforage
+        if (msg === "") {
+            return JSON.parse(await localforge.getItem(key))
+        } else {
+            return await localforge.setItem(key, JSON.stringify(msg))
         }
     }
 }
@@ -284,11 +308,8 @@ function add_button() {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]
             var A = new Article(IDs)
-            A.init()
+            A.reinit()
         }
         $(".box-colored")[0].append(button)
     }
 }
-
-
-
