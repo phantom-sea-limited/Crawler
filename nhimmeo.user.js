@@ -297,8 +297,9 @@ function check_Task_status() {
 }
 
 function add_task_status() {
-    var l = Task.localconfig().length
-    if (l != 0) { msg = `任务剩余${l}` }
+    var l = Task.localconfig()
+    if (l == null) { msg = "任务已完成"; window.add_task_status = 0 }
+    else if (l.length != 0) { msg = `任务剩余${l.length}` }
     else { msg = "任务已完成"; window.add_task_status = 0 }
     var a = $(".fa-coffee")[0]
     // a.nextElementSibling.href = null
@@ -333,14 +334,14 @@ function add_button() {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]
             var A = new Article(IDs)
-            A.reinit()
+            A.reinit().then(res => { })
         }))
         main.append(document.createElement("br"))
         main.append(create("下载(稳定)", "fa-download", function () {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]
             var A = new Article(IDs, "async")
-            A.reinit()
+            A.reinit().then(res => { })
         }))
         main.append(document.createElement("br"))
         main.append(create("修复下载/继续章节(高速)", "fa-download", function () {
