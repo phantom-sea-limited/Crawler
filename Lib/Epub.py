@@ -1,3 +1,4 @@
+import zipfile
 import os
 from .Network import Network
 
@@ -5,6 +6,25 @@ from .Network import Network
 def mkdir(path):
     if os.path.exists(path) != True:
         os.mkdir(path)
+
+
+def ZIP_EPUB(parent_directory):
+    # 遍历目录下的子目录
+    for directory in os.listdir(parent_directory):
+        dir_path = os.path.join(parent_directory, directory)
+        if os.path.isdir(dir_path):
+            # 获取子目录的名称
+            dir_name = os.path.basename(dir_path)
+
+            # 创建归档文件
+            zip_file_path = os.path.join(dir_path, dir_name + ".epub")
+            with zipfile.ZipFile(zip_file_path, "w", compression=zipfile.ZIP_STORED) as zipf:
+                # 递归地添加子目录中的文件和文件夹到归档文件
+                for root, dirs, files in os.walk(dir_path):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        arc_name = os.path.relpath(file_path, dir_path)
+                        zipf.write(file_path, arcname=arc_name)
 
 
 class Epub():
@@ -202,6 +222,7 @@ text = [{
                     '''<itemref idref="{}" />\n'''.format(i["url"].replace("Text/", "")))
             f.write(
                 '''</spine>\n<guide>\n<reference href="Text/cover.xhtml" title="书籍封面" type="cover" />\n</guide>\n</package>''')
+        ZIP_EPUB(self.out_path)
 
 
 class TXT():
