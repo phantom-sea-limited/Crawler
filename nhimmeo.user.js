@@ -20,39 +20,43 @@ class Article {
     tag = null;
     chapterList = [];
     init_status = false;
-    constructor(ID) {
+    load_status = false
+    constructor(ID, mode = "normal") {
         this.ID = ID;
+        this.mode = mode
         this.load();
     }
 
-    init() {
+    async init() {
         this.init_status = true
         Task.add(
             [
-                Task.createBymethod(this.ID, "fetchInfo"),
-                Task.createBymethod(this.ID, "fetchCatalog"),
-                Task.createBymethod(this.ID, "PrefetchChapter"),
-                Task.createBymethod(this.ID, "file"),
+                Task.createBymethod(this.ID, "fetchInfo", this.mode),
+                Task.createBymethod(this.ID, "fetchCatalog", this.mode),
+                Task.createBymethod(this.ID, "PrefetchChapter", this.mode),
+                Task.createBymethod(this.ID, "file", this.mode),
             ]
         )
-        this.save()
-        Task.init()
+        await this.save()
+        setTimeout(Task.init, 200)
     }
 
     reinit() {
         if (this.init_status != true) {
             Task.add(
                 [
-                    Task.createBymethod(this.ID, "fetchInfo"),
-                    Task.createBymethod(this.ID, "fetchCatalog"),
-                    Task.createBymethod(this.ID, "PrefetchChapter"),
-                    Task.createBymethod(this.ID, "file"),
+                    Task.createBymethod(this.ID, "fetchInfo", this.mode),
+                    Task.createBymethod(this.ID, "fetchCatalog", this.mode),
+                    Task.createBymethod(this.ID, "PrefetchChapter", this.mode),
+                    Task.createBymethod(this.ID, "file", this.mode),
                 ]
             )
+            setTimeout(Task.init, 200)
         }
     }
 
-    fetchInfo() {
+    async fetchInfo() {
+        await this.load()
         if (document.location.href == 'https://zh.nhimmeo.cf/book/' + this.ID) {
             this.details = $(".detail_des")[0].innerText
             this.author = $('#book_author')[0].innerText
@@ -61,13 +65,14 @@ class Article {
             this.cover = $("#pic_cover")[0].dataset.src
             this.tag = $("#book_tags")[0].innerText
         } else {
-            Task.add(Task.createBymethod(this.ID, "fetchInfo"), "push")
+            Task.add(Task.createBymethod(this.ID, "fetchInfo", this.mode), "push")
             window.Task_STOP = true
             document.location.href = 'https://zh.nhimmeo.cf/book/' + this.ID
         }
     }
 
-    fetchCatalog() {
+    async fetchCatalog() {
+        await this.load()
         if (document.location.href == `https://zh.nhimmeo.cf/book/${this.ID}/catalog/`) {
             var all = $(".collapsible")
             var i = 0
@@ -97,25 +102,27 @@ class Article {
                 i += 1
             }
         } else {
-            Task.add(Task.createBymethod(this.ID, "fetchCatalog"), "push")
+            Task.add(Task.createBymethod(this.ID, "fetchCatalog", this.mode), "push")
             window.Task_STOP = true
             document.location.href = `https://zh.nhimmeo.cf/book/${this.ID}/catalog/`
         }
     }
 
-    fetchChapter(i, j) {
+    async fetchChapter(i, j) {
+        await this.load()
         var chap = this.chapterList[i].lists[j]
         if (chap["CanDownload"] == "userchap") { chap.href = chap.href.replace("/chap/", "/shchap/") }
         if (document.location.href == chap.href) {
             chap.content = $("article")[0].innerHTML.replaceAll("<br>", "")
         } else {
-            Task.add(Task.create(this.ID, [`A.fetchChapter(${i},${j})`]), "push")
+            Task.add(Task.create(this.ID, [`await A.fetchChapter(${i},${j})`], this.mode), "push")
             window.Task_STOP = true
             document.location.href = chap.href
         }
     }
 
-    PrefetchChapter() {
+    async PrefetchChapter() {
+        await this.load()
         if (this.chapterList != null) {
             var tasklists = []
             var i = 0
@@ -123,7 +130,7 @@ class Article {
                 var j = 0
                 chap.lists.forEach(chapinfo => {
                     if (chapinfo['CanDownload'] != false && chapinfo["content"] == "") {
-                        tasklists.unshift(Task.create(this.ID, [`A.fetchChapter(${i},${j})`]))
+                        tasklists.unshift(Task.create(this.ID, [`await A.fetchChapter(${i},${j})`], this.mode))
                     }
                     j++
                 })
@@ -145,7 +152,8 @@ class Article {
         }
     }
 
-    file() {
+    async file() {
+        await this.load()
         let link = document.createElement('a');
         link.download = `${this.bookname}.json`;
         let blob = new Blob([JSON.stringify(this.output())], { type: 'text/json' });
@@ -154,30 +162,36 @@ class Article {
         URL.revokeObjectURL(link.href);
     }
 
-    load() {
-        var tmp = Article.localconfig(this.ID);
-        if (tmp != null) {
-            // function s(one, two) {
-            //     try { one = two } catch { }
-            // }
-            // s(this.bookname, tmp.bookname);
-            // s(this.details, tmp.details);
-            // s(this.author, tmp.author);
-            // s(this.chapterList, tmp.chapterList);
-            this.bookname = tmp.bookname;
-            this.details = tmp.details;
-            this.author = tmp.author;
-            this.tag = tmp.tag
-            this.chapterList = tmp.chapterList;
-            this.cover = tmp.cover;
-            this.book_uptime = tmp.book_uptime;
-        } else {
-            this.init()
+    async load() {
+        if (this.load_status != true) {
+            if (this.mode == "normal") {
+                var tmp = Article.localconfig(this.ID);
+            } else {
+                var tmp = await Article.localforge(this.ID)
+                if (tmp == null) { tmp = Article.localconfig(this.ID) }
+            }
+            if (tmp != null) {
+                this.bookname = tmp.bookname;
+                this.details = tmp.details;
+                this.author = tmp.author;
+                this.tag = tmp.tag
+                this.chapterList = tmp.chapterList;
+                this.cover = tmp.cover;
+                this.book_uptime = tmp.book_uptime;
+            } else {
+                await this.init()
+            }
+            this.load_status = true
         }
     }
 
-    save() {
-        Article.localconfig(this.ID, this.output())
+    async save() {
+        if (this.mode == "normal") {
+            Article.localconfig(this.ID, this.output())
+        } else {
+            await Article.localforge(this.ID, this.output())
+        }
+
     }
 
     static localconfig(key, msg = '') {
@@ -199,17 +213,14 @@ class Article {
 }
 
 window.Task_STOP = false
-window.Task_info = null
 class Task {
-    static createBymethod(ID, method) {
-        return `(function () {
-            var A = new Article(${ID})
-            A.${method}()
-            A.save();
-        })()`
+    static createBymethod(ID, method, mode = "normal") {
+        return `
+            var A = new Article(${ID},\"${mode}\")
+            A.${method}().then(res=>{A.save()})`
     }
 
-    static create(ID, lines) {
+    static create(ID, lines, mode = "normal") {
         function _(lines) {
             var command = ""
             lines.forEach(element => {
@@ -217,11 +228,12 @@ class Task {
             })
             return command
         }
-        return `(function () {
-            var A = new Article(${ID})
-            ${_(lines)}
-            A.save();
-        })()`
+        return `
+            var A = new Article(${ID},\"${mode}\")
+            async function _(){
+                ${_(lines)}
+            }
+            _().then(res=>{A.save()})`
     }
 
 
@@ -239,20 +251,18 @@ class Task {
     }
 
     static init() {
-        window.Task_info = Task.localconfig()
         var commands = window.Task_info
         var command;
         if (commands != null) {
-            while (commands.length != 0 && window.Task_STOP != true) {
-                // if (document.readyState == "complete") {
+            if (commands.length != 0 && window.Task_STOP != true) {
                 command = commands.pop()
                 eval(command)
                 console.log(command)
                 Task.localconfig(commands)
-                // }
+                setTimeout(Task.init, 200)
             }
         }
-        console.log("Task all over!")
+        console.log("Task finish! waiting for another")
     }
 
     static localconfig(msg = '') {
@@ -263,6 +273,7 @@ class Task {
         }
     }
 }
+window.Task_info = Task.localconfig()
 
 window.Article = Article
 window.Task = Task
@@ -287,7 +298,7 @@ function check_Task_status() {
 
 
 function add_button() {
-    IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
+    var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
     if (IDs != null) {
         IDs = IDs[1]
 
@@ -313,3 +324,4 @@ function add_button() {
         $(".box-colored")[0].append(button)
     }
 }
+
