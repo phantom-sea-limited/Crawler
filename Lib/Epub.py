@@ -76,6 +76,13 @@ class Epub():
                             f.write(r.content)
                         self.piclist.append(url)
                         break
+                    elif r.status_code == 404:
+                        print(
+                            f"[ERR]:\t{url}\t图片疑似缺失，自动跳过，如果需要手动处理，请手动下载该文件置于{path}")
+                        break
+                    else:
+                        print(f"[ERR]:\t{url}\t网络请求异常，响应代码:{r.status_code}")
+                        raise Exception(f"网络请求异常，响应代码:{r.status_code}")
                 except:
                     import traceback
                     print(traceback.format_exc())
