@@ -27,6 +27,8 @@
 
 4. 在`.tmp`目录下找到成品
 
+[**高级说明**](https://github.com/phantom-sea-limited/Crawler/nhimmeo.md)
+
 ## **同人小说(通用)**
 
 大部分同人网站那源码都一样的东西，做了个模板，可以直接爬
