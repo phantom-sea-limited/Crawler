@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    https://zh.nhimmeo.cf/
-// @version      1.2
+// @version      1.3
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -24,7 +24,7 @@ class Article {
     constructor(ID, mode = "normal") {
         this.ID = ID;
         this.mode = mode
-        this.load();
+        // this.load();
     }
 
     async init() {
@@ -330,28 +330,28 @@ function add_button() {
             button.onclick = func
             return button
         }
-        main.append(create("下载(高效)", "fa-download", function () {
+        main.append(create("下载(高速)", "fa-download", function () {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]
             var A = new Article(IDs)
-            A.reinit().then(res => { })
+            A.load().then(res => { A.reinit() })
         }))
-        main.append(document.createElement("br"))
+        // main.append(document.createElement("br"))
         main.append(create("下载(稳定)", "fa-download", function () {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]
             var A = new Article(IDs, "async")
-            A.reinit().then(res => { })
+            A.load().then(res => { A.reinit() })
         }))
         main.append(document.createElement("br"))
-        main.append(create("修复下载/继续章节(高速)", "fa-download", function () {
+        main.append(create("修复下载(高速)", "fa-download", function () {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]
             var A = new Article(IDs)
             A.PrefetchChapter().then(res => { Task.init() })
         }))
-        main.append(document.createElement("br"))
-        main.append(create("修复下载/继续章节(稳定)", "fa-download", function () {
+        // main.append(document.createElement("br"))
+        main.append(create("修复下载(稳定)", "fa-download", function () {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]
             var A = new Article(IDs, "async")
@@ -364,7 +364,7 @@ function add_button() {
             var A = new Article(IDs)
             A.file()
         }))
-        main.append(document.createElement("br"))
+        // main.append(document.createElement("br"))
         main.append(create("手动导出(稳定)", "fa-floppy-o", function () {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]
@@ -375,7 +375,7 @@ function add_button() {
         main.append(create("清空高速缓存", "fa-times", function () {
             localStorage.clear()
         }, "secondary"))
-        main.append(document.createElement("br"))
+        // main.append(document.createElement("br"))
         main.append(create("清空稳定缓存", "fa-times", function () {
             localforage.clear()
         }, "secondary"))
