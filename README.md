@@ -27,7 +27,7 @@
 
 4. 在`.tmp`目录下找到成品
 
-[**高级说明**](https://github.com/phantom-sea-limited/Crawler/nhimmeo.md)
+[**高级说明**](https://github.com/phantom-sea-limited/Crawler/blob/main/nhimmeo.md)
 
 ## **同人小说(通用)**
 
