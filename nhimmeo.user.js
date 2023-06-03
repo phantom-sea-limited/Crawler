@@ -313,26 +313,26 @@ function add_task_status() {
 
 function add_button() {
     var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
+    function create(msg, icon, func, colored = "inverse") {
+        var button = document.createElement("button")
+        button.classList.add(colored)
+        button.classList.add("shadowed")
+        button.classList.add("small")
+        var button_a = document.createElement("a")
+        button_a.classList.add("color_white")
+        var button_i = document.createElement("i")
+        button_i.classList.add("fa")
+        button_i.classList.add(icon)
+        button_i.ariaHidden = true
+        button_a.append(button_i)
+        button_a.append(msg)
+        button.append(button_a)
+        button.onclick = func
+        return button
+    }
     if (IDs != null) {
         IDs = IDs[1]
         var main = $(".box-colored")[0]
-        function create(msg, icon, func, colored = "inverse") {
-            var button = document.createElement("button")
-            button.classList.add(colored)
-            button.classList.add("shadowed")
-            button.classList.add("small")
-            var button_a = document.createElement("a")
-            button_a.classList.add("color_white")
-            var button_i = document.createElement("i")
-            button_i.classList.add("fa")
-            button_i.classList.add(icon)
-            button_i.ariaHidden = true
-            button_a.append(button_i)
-            button_a.append(msg)
-            button.append(button_a)
-            button.onclick = func
-            return button
-        }
         main.append(create("下载(高速)", "fa-download", function () {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]
@@ -383,6 +383,14 @@ function add_button() {
             localforage.clear()
         }, "secondary"))
     } else {
+        if (document.location.href.includes('chap')) {
+            var main = $("div.center")[2]
+            main.append(create("终止任务", "fa-times", function () {
+                window.Task_STOP = true
+                window.Task_info = []
+                Task.localconfig([])
+            }, "secondary"))
+        }
         setTimeout(add_task_status)
     }
 }
