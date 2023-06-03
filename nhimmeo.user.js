@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    https://zh.nhimmeo.cf/
-// @version      1.3
+// @version      1.4
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -137,6 +137,9 @@ class Article {
                 })
                 i++
             })
+            if (tasklists.length != 0) {
+                tasklists.unshift(Task.createBymethod(this.ID, "PrefetchChapter", this.mode))
+            }
             Task.add(tasklists, "push")
         }
     }
