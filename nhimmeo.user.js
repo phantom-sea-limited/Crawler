@@ -376,7 +376,9 @@ function add_button() {
         }))
         main.append(document.createElement("br"))
         main.append(create("清空高速缓存", "fa-times", function () {
+            var book_mark = localStorage.getItem("book_mark")
             localStorage.clear()
+            localStorage.setItem("book_mark", book_mark)
         }, "secondary"))
         // main.append(document.createElement("br"))
         main.append(create("清空稳定缓存", "fa-times", function () {
