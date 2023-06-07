@@ -1,7 +1,13 @@
 # Crawler
 
+快速目录
 
-## **nhimmeo.cf 刺猬猫分享**
+1. [nhimmeocf-刺猬猫分享](#nhimmeocf-刺猬猫分享)
+2. [同人小说通用](#同人小说通用)
+3. [imwcr](#imwcr)
+4. [已失效内容](#已失效内容)
+
+# **nhimmeo.cf 刺猬猫分享**
 
 ### 相关文件
 
@@ -31,7 +37,7 @@
 
 [**高级说明**](https://github.com/phantom-sea-limited/Crawler/blob/main/nhimmeo.md)
 
-## **同人小说(通用)**
+# **同人小说(通用)**
 
 大部分同人网站那源码都一样的东西，做了个模板，可以直接爬
 
@@ -81,18 +87,6 @@ Phantom-sea © limited |∀` )
 
 - [https://m.bixiange.me/](https://m.bixiange.me/) </br>IP记录:209.74.107.162/209.74.107.163/209.74.107.165
 
-
-## **trxs(原版)[已失效]**
-
-### 相关文件
-
-> trxs.py
-
-前不久看见个同人小说的网站，写了个爬虫爬着玩
-这里是小说[网站地址](https://www.trxs123.com)
-
-~~编译完成之后的程序[在这下载](https://github.com/Rcrwrate/Crawler/tree/main/dist)~~
-
 ## **imwcr**
 
 ### 相关文件
@@ -111,7 +105,24 @@ IP记录:43.154.113.63
 
 实际上只是拥有者更换域名而已，功能还未测试，应该差不多改改就行
 
-## **zxcs**
+
+# 已失效内容
+<details>
+<summary>已失效内容</summary>
+  
+## **trxs(原版)[已失效]**
+  
+### 相关文件
+
+> trxs.py
+
+前不久看见个同人小说的网站，写了个爬虫爬着玩
+这里是小说[网站地址](https://www.trxs123.com)
+
+~~编译完成之后的程序[在这下载](https://github.com/Rcrwrate/Crawler/tree/main/dist)~~
+ 
+
+## **zxcs[已失效]**
 
 ### 相关文件
  
@@ -120,3 +131,13 @@ IP记录:43.154.113.63
 针对[http://zxcs.me/](http://zxcs.me/)编写的爬虫
 
 IP记录:92.242.62.123
+
+### 失效记录 2023.6.7
+  
+  具体情况可以通过如下链接查看
+  
+  https://webcache.googleusercontent.com/search?q=cache:https://zxcs.wiki/
+  
+  https://web.archive.org/web/20230602155316/https://zxcs.wiki/
+
+</details>
