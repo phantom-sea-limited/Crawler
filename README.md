@@ -15,11 +15,21 @@
 >
 > nhimmeo.py
 
+### 题外话
+
+> |∀` )被站长发现咯
+
+[请合理使用爬虫](https://ko-fi.com/post/For-Chinese-users-D1D1LZSTG)
+
+[如果可以的话，赞助一下这位站长](https://ko-fi.com/post/Alipay-Q5Q2M70VM)
+
 **使用说明**
 
 请使用[Tampermonkey](https://www.tampermonkey.net/)安装此用户脚本
 
 [**点击安装脚本**](https://github.com/phantom-sea-limited/Crawler/raw/main/nhimmeo.user.js)
+
+[**点击安装脚本(镜像)**](https://static.deception.world/https://github.com/phantom-sea-limited/Crawler/raw/main/nhimmeo.user.js)
 
 安装后，在书籍页面会出现一个黑色的下载框，点击就会自动操作，如果点击后没有反应，可以打开控制台康康有没有报错
 
