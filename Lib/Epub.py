@@ -1,5 +1,6 @@
 import zipfile
 import os
+from urllib.parse import urlparse
 from .Network import Network
 
 
@@ -8,23 +9,29 @@ def mkdir(path):
         os.mkdir(path)
 
 
+def ZIP_single(root_path, dir_path):
+    '''
+    root_path:文件夹根目录
+    dir_path:文件夹内文件夹路径
+    '''
+    # 获取子目录的名称
+    dir_name = os.path.basename(dir_path)
+    zip_file_path = os.path.join(root_path, dir_name + ".epub")
+    with zipfile.ZipFile(zip_file_path, "w", compression=zipfile.ZIP_STORED) as zipf:
+        # 递归地添加子目录中的文件和文件夹到归档文件
+        for root, dirs, files in os.walk(dir_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                arc_name = os.path.relpath(file_path, dir_path)
+                zipf.write(file_path, arcname=arc_name)
+
+
 def ZIP_EPUB(parent_directory):
     # 遍历目录下的子目录
     for directory in os.listdir(parent_directory):
         dir_path = os.path.join(parent_directory, directory)
         if os.path.isdir(dir_path):
-            # 获取子目录的名称
-            dir_name = os.path.basename(dir_path)
-
-            # 创建归档文件
-            zip_file_path = os.path.join(dir_path, dir_name + ".epub")
-            with zipfile.ZipFile(zip_file_path, "w", compression=zipfile.ZIP_STORED) as zipf:
-                # 递归地添加子目录中的文件和文件夹到归档文件
-                for root, dirs, files in os.walk(dir_path):
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        arc_name = os.path.relpath(file_path, dir_path)
-                        zipf.write(file_path, arcname=arc_name)
+            ZIP_single(parent_directory, dir_path)
 
 
 class Epub():
@@ -66,7 +73,7 @@ class Epub():
 
     def download(self, url):
         path = os.path.join(self.out_path, self.name,
-                            "OEBPS", "Images", url.split("/")[-1])
+                            "OEBPS", "Images", urlparse(url).path.split("/")[-1])
         if os.path.exists(path) != True:
             while True:
                 try:
@@ -229,7 +236,8 @@ text = [{
                     '''<itemref idref="{}" />\n'''.format(i["url"].replace("Text/", "")))
             f.write(
                 '''</spine>\n<guide>\n<reference href="Text/cover.xhtml" title="书籍封面" type="cover" />\n</guide>\n</package>''')
-        ZIP_EPUB(self.out_path)
+        # ZIP_EPUB(self.out_path)
+        ZIP_single(self.out_path, os.path.join(self.out_path, self.name))
 
 
 class TXT():
@@ -242,14 +250,3 @@ class TXT():
 
     def __del__(self):
         self.f.close()
-
-
-if __name__ == '__main__':
-    e = Epub("test", "adw")
-    e.cover("ABABA")
-    n = Network({})
-    e.plugin(n)
-    e.add_text("aaa", "wuti", [
-               "https://image.nmb.best/image/2022-09-13/6320726e73bd9.jpg"])
-
-    e.finish()

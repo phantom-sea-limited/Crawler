@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    https://zh.nhimmeo.cf/
-// @version      1.4
+// @version      1.5
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
 // @require      https://static.deception.world/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=nhimmeo.cf
+// @icon         https://api.phantom-sea-limited.ltd/favicon.ico
 // @grant        none
 // ==/UserScript==
 
