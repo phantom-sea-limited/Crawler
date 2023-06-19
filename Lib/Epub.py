@@ -81,7 +81,7 @@ class Epub():
                     if r.status_code == 200:
                         with open(path, "wb") as f:
                             f.write(r.content)
-                        self.piclist.append(url)
+                        self.piclist.append(urlparse(url).path)
                         break
                     elif r.status_code == 404:
                         print(
@@ -93,15 +93,18 @@ class Epub():
                 except:
                     import traceback
                     print(traceback.format_exc())
-                    print(f"[ERR]:\t{url}\t下载失败,是否重试[Y/n]")
+                    print(f"[ERR]:\t{url}\t下载失败,是否重试[Y/n]使用代理下载[P]")
                     inputs = input('>')
-                    if inputs != "n":
+                    if inputs == "P":
+                        url = "https://static.deception.world/" + url
+                        continue
+                    elif inputs != "n":
                         continue
                     else:
                         print(f'''[TIPS]:您需要手动下载该文件置于{path}''')
                         break
         else:
-            self.piclist.append(url)
+            self.piclist.append(urlparse(url).path)
 
     def cover(self, url, describe):
         with open(os.path.join(self.out_path, self.name, "OEBPS", "Text", "cover.xhtml"), "w", encoding="utf-8") as f:
@@ -115,7 +118,7 @@ class Epub():
 <body>
 <div style="text-align: center; padding: 0pt; margin: 0pt;">
 <svg xmlns="http://www.w3.org/2000/svg" height="100%" preserveAspectRatio="xMidYMid meet" version="1.1" viewBox="0 0 179 248" width="100%" xmlns:xlink="http://www.w3.org/1999/xlink">
-<image height="248" width="179" xlink:href="../Images/{url.split("/")[-1]}"></image>
+<image height="248" width="179" xlink:href="../Images/{urlparse(url).path.split("/")[-1]}"></image>
 </svg>
 </div>
 <h1>{self.name}</h1>
@@ -166,7 +169,7 @@ text = [{
                     if i["type"] == "img":
                         self.download(i["item"])
                         f.write(
-                            f'''<p>　　<img src="../Images/{i["item"].split("/")[-1]}" alt=""/></p>\n''')
+                            f'''<p>　　<img src="../Images/{urlparse(i["item"]).path.split("/")[-1]}" alt=""/></p>\n''')
                     elif i["type"] == "html":
                         f.write(f'''{i["item"]}\n''')
                     else:

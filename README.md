@@ -3,9 +3,10 @@
 快速目录
 
 1. [nhimmeocf-刺猬猫分享](#nhimmeocf-刺猬猫分享)
-2. [同人小说通用](#同人小说通用)
-3. [imwcr](#imwcr)
-4. [已失效内容](#已失效内容)
+2. [轻之国度](#轻之国度)
+3. [同人小说通用](#同人小说通用)
+4. [imwcr](#imwcr)
+5. [已失效内容](#已失效内容)
 
 # **nhimmeo.cf 刺猬猫分享**
 
@@ -46,6 +47,24 @@
 4. 在`.tmp`目录下找到成品
 
 [**高级说明**](https://github.com/phantom-sea-limited/Crawler/blob/main/nhimmeo.md)
+
+# **轻之国度**
+
+### 相关文件
+
+> lightnovel.us.user.js
+>
+> lightnovel.us.py
+
+**使用说明**
+
+请使用[Tampermonkey](https://www.tampermonkey.net/)安装此用户脚本
+
+[**点击安装脚本**](https://github.com/phantom-sea-limited/Crawler/raw/main/lightnovel.us.user.js)
+
+[**点击安装脚本(镜像)**](https://static.deception.world/https://github.com/phantom-sea-limited/Crawler/raw/main/lightnovel.us.user.js)
+
+温馨提示：GUI尚未完工
 
 # **同人小说(通用)**
 
