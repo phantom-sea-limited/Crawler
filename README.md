@@ -24,6 +24,8 @@
 
 [如果可以的话，赞助一下这位站长](https://ko-fi.com/post/Alipay-Q5Q2M70VM)
 
+[身份验证:这个人是我.jpg](https://ko-fi.com/Rcrwrate)
+
 **使用说明**
 
 请使用[Tampermonkey](https://www.tampermonkey.net/)安装此用户脚本
@@ -56,6 +58,10 @@
 >
 > lightnovel.us.py
 
+### 题外话
+
+> 请合理使用，禁止在任何平台传播本脚本
+
 **使用说明**
 
 请使用[Tampermonkey](https://www.tampermonkey.net/)安装此用户脚本
@@ -64,7 +70,13 @@
 
 [**点击安装脚本(镜像)**](https://static.deception.world/https://github.com/phantom-sea-limited/Crawler/raw/main/lightnovel.us.user.js)
 
-温馨提示：GUI尚未完工
+1. 在https://www.lightnovel.us/cn/series/312之类的合集详情页面，点击下载相关按钮，仅仅提供稳定相关服务
+
+2. 在执行完之后，会产生一个包含所有信息的json文件，由于目前没做js的epub打包，可以先用python版本的
+
+3. 执行`python lightnovel.us.py ****.json`打包epub，过程中会下载一些网络图片，请静候
+
+4. 在`.tmp`目录下找到成品
 
 # **同人小说(通用)**
 

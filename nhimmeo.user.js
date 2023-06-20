@@ -301,13 +301,15 @@ function check_Task_status() {
 
 function add_task_status() {
     var l = Task.localconfig()
-    if (l == null) { msg = "任务已完成"; window.add_task_status = 0 }
+    if (l == null) { msg = "任务已完成" }
     else if (l.length != 0) { msg = `任务剩余${l.length}` }
-    else { msg = "任务已完成"; window.add_task_status = 0 }
+    else { msg = "任务已完成" }
     var a = $(".fa-coffee")[0]
     // a.nextElementSibling.href = null
     a.nextElementSibling.innerText = msg
-    setTimeout(add_task_status, 2000)
+    if (msg != "任务已完成") {
+        setTimeout(add_task_status, 2000)
+    }
 }
 
 
