@@ -61,6 +61,8 @@
 ### 题外话
 
 > 请合理使用，禁止在任何平台传播本脚本
+>
+> [**高级说明请参考nhimmeo.md**](https://github.com/phantom-sea-limited/Crawler/blob/main/nhimmeo.md)
 
 **使用说明**
 
@@ -69,6 +71,8 @@
 [**点击安装脚本**](https://github.com/phantom-sea-limited/Crawler/raw/main/lightnovel.us.user.js)
 
 [**点击安装脚本(镜像)**](https://static.deception.world/https://github.com/phantom-sea-limited/Crawler/raw/main/lightnovel.us.user.js)
+
+![image](https://github.com/phantom-sea-limited/Crawler/assets/46920034/a89b82bd-039f-420d-81cd-397402780ef4)
 
 1. 在https://www.lightnovel.us/cn/series/312之类的合集详情页面，点击下载相关按钮，仅仅提供稳定相关服务
 
