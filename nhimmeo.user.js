@@ -8,6 +8,7 @@
 // @require      https://static.deception.world/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
 // @icon         https://api.phantom-sea-limited.ltd/favicon.ico
 // @grant        none
+// @license      MIT
 // ==/UserScript==
 
 
