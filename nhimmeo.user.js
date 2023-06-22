@@ -302,6 +302,7 @@ function check_Task_status() {
 
 function add_task_status() {
     var l = Task.localconfig()
+    var msg
     if (l == null) { msg = "任务已完成" }
     else if (l.length != 0) { msg = `任务剩余${l.length}` }
     else { msg = "任务已完成" }

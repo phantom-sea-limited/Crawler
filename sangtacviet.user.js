@@ -36,7 +36,7 @@ class Article {
 
     async init() {
         this.init_status = true
-        Task.add(
+        await Task.add(
             [
                 Task.createBymethod(this.ID, this.ori, "fetchInfo", this.mode),
                 Task.createBymethod(this.ID, this.ori, "fetchCatalog", this.mode),
@@ -51,7 +51,7 @@ class Article {
     async reinit() {
         await this.load()
         if (this.init_status != true) {
-            Task.add(
+            await Task.add(
                 [
                     Task.createBymethod(this.ID, this.ori, "fetchInfo", this.mode),
                     Task.createBymethod(this.ID, this.ori, "fetchCatalog", this.mode),
@@ -73,7 +73,7 @@ class Article {
             this.cover = bookinfo.thumb
             this.tag = ""
         } else {
-            Task.add(Task.createBymethod(this.ID, this.ori, "fetchInfo", this.mode), "push")
+            await Task.add(Task.createBymethod(this.ID, this.ori, "fetchInfo", this.mode), "push")
             window.Task_STOP = true
             document.location.href = `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/`
         }
@@ -115,7 +115,7 @@ class Article {
                 this.chapterList.push(chaplist)
             }
         } else {
-            Task.add(Task.createBymethod(this.ID, this.ori, "fetchCatalog", this.mode), "push")
+            await Task.add(Task.createBymethod(this.ID, this.ori, "fetchCatalog", this.mode), "push")
             window.Task_STOP = true
             document.location.href = `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/`
         }
@@ -128,7 +128,7 @@ class Article {
         if (document.location.href == chap.href) {
             chap.content = $("article")[0].innerHTML.replaceAll("<br>", "")
         } else {
-            Task.add(Task.create(this.ID, this.ori, [`await A.fetchChapter(${i},${j})`], this.mode), "push")
+            await Task.add(Task.create(this.ID, this.ori, [`await A.fetchChapter(${i},${j})`], this.mode), "push")
             window.Task_STOP = true
             document.location.href = chap.href
         }
@@ -152,7 +152,7 @@ class Article {
             if (tasklists.length != 0) {
                 tasklists.unshift(Task.createBymethod(this.ID, this.ori, "PrefetchChapter", this.mode))
             }
-            Task.add(tasklists, "push")
+            await Task.add(tasklists, "push")
         }
     }
 
@@ -274,7 +274,7 @@ class Task {
     }
 
 
-    static add(command, mode = "unshift") {
+    static async add(command, mode = "unshift") {
         var commands = window.Task_info
         if (commands == null) { commands = [] }
         if (typeof (command) == 'object') {
@@ -284,11 +284,11 @@ class Task {
         } else {
             if (mode == "unshift") { commands.unshift(command) } else { commands.push(command) }
         }
-        Task.localconfig(commands)
+        await Task.localconfig(commands)
     }
 
-    static init() {
-        window.Task_info = Task.localconfig()
+    static async init() {
+        window.Task_info = await Task.localconfig()
         var commands = window.Task_info
         var command;
         if (commands != null) {
@@ -296,33 +296,34 @@ class Task {
                 command = commands.pop()
                 eval(command)
                 GM_log(command)
-                Task.localconfig(commands)
+                await Task.localconfig(commands)
                 setTimeout(Task.init, 200)
             }
         }
         GM_log("Task finish! waiting for another")
     }
 
-    static localconfig(msg = '') {
-        if (msg === '') {
-            return JSON.parse(localStorage.getItem("Task"));
-        } else {
-            return localStorage.setItem("Task", JSON.stringify(msg))
-        }
+    static async localconfig(msg = '') {
+        return await Article.GM_config("Task", msg)
     }
 }
-window.Task_info = Task.localconfig()
+window.Task_info = await Task.localconfig()
+window.Task_statu = null
 
 
 // INIT
-
 setTimeout(check)
 function check() {
-    if (document.body.innerText.contain("检查站点连接是否安全") || document.body.innerText.contain("Error code")) {
+    try {
+        if (document.body.innerText.contain("检查站点连接是否安全") || document.body.innerText.contain("Error code")) {
+            setTimeout(check, 1000)
+        } else {
+            run()
+        }
+    } catch {
         setTimeout(check, 1000)
-    } else {
-        run()
     }
+
 }
 
 function run() {
@@ -338,6 +339,8 @@ function run() {
         setTimeout(insert)
         setTimeout(add_button)
     }
+    setTimeout(Task.init)
+    setTimeout(add_task_status)
 }
 
 function decryptAes(encrypted, key, iv) {
@@ -397,4 +400,16 @@ function add_button() {
         })
         title().innerText = "注入已执行"
     }))
+}
+
+async function add_task_status() {
+    var l = await Task.localconfig()
+    var msg
+    if (l == null) { msg = "任务已完成" }
+    else if (l.length != 0) { msg = `任务剩余${l.length}` }
+    else { msg = "任务已完成" }
+    title().innerText = msg
+    if (msg != "任务已完成") {
+        setTimeout(add_task_status, 2000)
+    }
 }
