@@ -5,6 +5,7 @@
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
+// @match        https://zh.nhimmeo.cf/book/*
 // @match        https://wap.ciweimao.com/book/*
 // @icon         https://api.phantom-sea-limited.ltd/favicon.ico
 // @require      https://static.deception.world/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
@@ -26,7 +27,8 @@ class Article {
     tag = null;
     chapterList = [];
     init_status = false;
-    load_status = false
+    load_status = false;
+    more = {};
     constructor(ID, ori, mode = "normal") {
         this.ID = ID;
         this.ori = ori
@@ -82,32 +84,33 @@ class Article {
     async fetchCatalog() {
         await this.load()
         if (document.location.href == `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/`) {
-            if (window.log == null) {
+            var log = localStorage.getItem("LOG")
+            if (log == null) {
                 insert()
-                await sleep(1000)
+                await sleep(5000)
                 await this.fetchCatalog()
             } else {
-                var oldchaperList = [...this.chapterList]
+                // var oldchaperList = [...this.chapterList]
                 this.chapterList = []
-                var chaps = window.log.split("-//-")
-                var chaplist = []
+                var chaps = log.split("-//-")
+                var chaplist = {}
                 chaps.forEach(chap => {
                     var chap = chap.split("-/-")
                     if (chap.length == 3) {
-                        chaplist.push({
+                        chaplist[chap[1]] = {
                             "name": chap[2],
-                            "href": `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/${chap[1]}`,
+                            "href": `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/${chap[1]}/`,
                             "content": "",
                             "CanDownload": true
-                        })
+                        }
                     } else if (chap.length == 4) {
                         if (chap[3] == "unvip") { var CanDownload = true } else { var CanDownload = false }
-                        chaplist.push({
+                        chaplist[chap[1]] = {
                             "name": chap[2],
-                            "href": `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/${chap[1]}`,
+                            "href": `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/${chap[1]}/`,
                             "content": "",
                             "CanDownload": CanDownload
-                        })
+                        }
                     } else {
                         GM_log(chap)
                     }
@@ -121,12 +124,93 @@ class Article {
         }
     }
 
+    async translateCatalog() {
+        await this.load()
+        async function c(Article) {
+            if (document.body.innerText.includes("书籍不存在或未审核通过")) {
+                Article.more['c'] = "failed"
+                await Article.save()
+            }
+            if (document.location.href == `https://wap.ciweimao.com/book/${Article.ID}`) {
+                var main = document.getElementsByClassName("cnt-inner")[0]
+                var h2 = main.getElementsByTagName("h2")
+                var ul = main.getElementsByTagName("ul")
+                var i = 0
+                Article.chapterList = Article.chapterList.slice(0, 1)
+                while (i < h2.length) {
+                    var chap = { "name": h2[i].innerText, "lists": {} }
+                    var j = 0
+                    while (j < ul[i].children.length) {
+                        var ID = ul[i].children[j].children[0].href.replace("https://wap.ciweimao.com/chapter/", "")
+                        chap.lists[ID] = Article.chapterList[0][ID]
+                        chap.lists[ID]["name"] = ul[i].children[j].innerText
+                        j++
+                    }
+                    i++
+                    Article.chapterList.push(chap)
+                }
+            } else {
+                await Task.add(Task.createBymethod(Article.ID, Article.ori, "translateCatalog", Article.mode), "push")
+                window.Task_STOP = true
+                document.location.href = `https://wap.ciweimao.com/book/${Article.ID}`
+            }
+        }
+        async function c2(Article) {
+            if (document.location.href == `https://zh.nhimmeo.cf/book/${Article.ID}/catalog/`) {
+                var all = document.getElementsByClassName("collapsible")
+                var i = 0
+                Article.chapterList = Article.chapterList.slice(0, 1)
+                while (i < all.length) {
+                    var catalog = { "name": all[i].innerText.split("\n")[1], "lists": {} }
+                    var chaplist = all[i].nextElementSibling.getElementsByClassName("chapter_info")
+                    var j = 0
+                    while (j < chaplist.length) {
+                        var downloadstate = false
+                        var ID = chaplist[j].nextElementSibling.nextElementSibling.childNodes[0].href.split('/').pop()
+                        catalog.lists[ID] = Article.chapterList[0][ID]
+                        catalog.lists[ID]['name'] = chaplist[j].nextElementSibling.nextElementSibling.innerText
+                        j += 1
+                    }
+                    Article.chapterList.push(catalog)
+                    i += 1
+                }
+            } else {
+                await Task.add(Task.createBymethod(Article.ID, Article.ori, "translateCatalog", Article.mode), "push")
+                window.Task_STOP = true
+                document.location.href = `https://zh.nhimmeo.cf/book/${Article.ID}/catalog/`
+            }
+        }
+        if (this.ori == "ciweimao" && this.more['c'] == undefined) { await c(this) }
+        else if (this.ori == "ciweimao") { await c2(this) }
+    }
+
+    async translateInfo() {
+        await this.load()
+        async function c(Article) {
+            if (document.location.href == `https://wap.ciweimao.com/book/${Article.ID}`) {
+                Article.details = document.getElementsByClassName("desc-cnt")[0].innerText
+                Article.tag = document.getElementsByClassName("cnt-inner")[1].innerText
+            } else {
+                await Task.add(Task.createBymethod(Article.ID, Article.ori, "translateInfo", Article.mode), "push")
+                window.Task_STOP = true
+                document.location.href = `https://wap.ciweimao.com/book/${Article.ID}`
+            }
+        }
+        if (this.ori == "ciweimao") { await c(this) }
+    }
+
     async fetchChapter(i, j) {
         await this.load()
         var chap = this.chapterList[i].lists[j]
-        if (chap["CanDownload"] == "userchap") { chap.href = chap.href.replace("/chap/", "/shchap/") }
         if (document.location.href == chap.href) {
-            chap.content = $("article")[0].innerHTML.replaceAll("<br>", "")
+            if (chapterfetcher.responseText != null) {
+                var content = document.getElementsByClassName("contentbox")[1]
+                content.children[0].remove()
+                chap.content = content.innerHTML.replaceAll("<br>", "\n")
+            } else {
+                await sleep(1000)
+                await this.fetchChapter(i, j)
+            }
         } else {
             await Task.add(Task.create(this.ID, this.ori, [`await A.fetchChapter(${i},${j})`], this.mode), "push")
             window.Task_STOP = true
@@ -138,15 +222,14 @@ class Article {
         await this.load()
         if (this.chapterList != null) {
             var tasklists = []
-            var i = 0
-            this.chapterList.forEach(chap => {
-                var j = 0
-                chap.lists.forEach(chapinfo => {
+            var i = 1
+            this.chapterList.slice(1).forEach(chap => {
+                for (let k in chap.lists) {
+                    var chapinfo = chap.lists[k]
                     if (chapinfo['CanDownload'] != false && chapinfo["content"] == "") {
-                        tasklists.unshift(Task.create(this.ID, this.ori, [`await A.fetchChapter(${i},${j})`], this.mode))
+                        tasklists.unshift(Task.create(this.ID, this.ori, [`await A.fetchChapter(${i},${k})`], this.mode))
                     }
-                    j++
-                })
+                }
                 i++
             })
             if (tasklists.length != 0) {
@@ -166,6 +249,7 @@ class Article {
             'author': this.author,
             'tag': this.tag,
             'chapterList': this.chapterList,
+            'more': this.more
         }
     }
 
@@ -202,6 +286,7 @@ class Article {
                 this.chapterList = tmp.chapterList;
                 this.cover = tmp.cover;
                 this.book_uptime = tmp.book_uptime;
+                this.more = tmp.more
             } else {
                 await this.init()
             }
@@ -253,7 +338,7 @@ window.Task_STOP = false
 class Task {
     static createBymethod(ID, ori, method, mode = "normal") {
         return `
-            var A = new Article(${ID},${ori},\"${mode}\")
+            var A = new Article(${ID},\"${ori}\",\"${mode}\")
             A.${method}().then(res=>{A.save()})`
     }
 
@@ -266,7 +351,7 @@ class Task {
             return command
         }
         return `
-            var A = new Article(${ID},${ori},\"${mode}\")
+            var A = new Article(${ID},\"${ori}\",\"${mode}\")
             async function _(){
                 ${_(lines)}
             }
@@ -314,16 +399,26 @@ window.Task_statu = null
 // INIT
 setTimeout(check)
 function check() {
+    GM_log("Start checking!")
     try {
-        if (document.body.innerText.contain("检查站点连接是否安全") || document.body.innerText.contain("Error code")) {
-            setTimeout(check, 1000)
-        } else {
+        if (document.location.hostname == "sangtacviet.vip") {
+            if (document.body.innerText.contain("检查站点连接是否安全") || document.body.innerText.contain("Error code")) {
+                setTimeout(check, 2000)
+            } else {
+                run()
+            }
+        } else if (document.location.hostname == "wap.ciweimao.com") {
+            if (document.body.innerText.search("检查站点连接是否安全") != -1 || document.body.innerText.search("Error code") != -1) {
+                setTimeout(check, 2000)
+            } else {
+                run()
+            }
+        } else if (document.location.hostname == "zh.nhimmeo.cf") {
             run()
         }
     } catch {
-        setTimeout(check, 1000)
+        setTimeout(check, 2000)
     }
-
 }
 
 function run() {
@@ -332,25 +427,12 @@ function run() {
     document.cookie = 'transmode=chinese	 ;path=/ ;expires=' + exp.toGMTString();
     GM_log("Start running!")
 
-    window.log = null
     var IDs = document.location.href.match(/\/(ciweimao|sfacg)\/\d+\/(\d+)\/$/)
     window.IDs = IDs
-    if (IDs != null) {
-        setTimeout(insert)
-        setTimeout(add_button)
-    }
+    setTimeout(add_button)
+    setTimeout(insert)
     setTimeout(Task.init)
     setTimeout(add_task_status)
-}
-
-function decryptAes(encrypted, key, iv) {
-    encrypted = CryptoJS.enc.Base64.parse(encrypted);
-    key = CryptoJS.enc.Utf8.parse(key);
-    iv = CryptoJS.enc.Utf8.parse(iv);
-    var decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, { iv: iv });
-    var out = decrypted.toString(CryptoJS.enc.Utf8);
-    window.log = out
-    return out
 }
 
 //insert JS into Page
@@ -361,16 +443,39 @@ function insert() {
         s.innerHTML = func.toString()
         document.body.append(s)
     }
-    function EX(a, b, c) {
-        window.Article = a
-        window.Task = b
-        window.a = c
+    function EX(a, b, c, d = null) {
+        window.STV = {}
+        window.STV.Article = a
+        window.STV.Task = b
+        window.STV.window = c
+        window.a = d
     }
-    install(decryptAes)
-    renewchapter()
+    function decryptAes(encrypted, key, iv) {
+        encrypted = CryptoJS.enc.Base64.parse(encrypted);
+        key = CryptoJS.enc.Utf8.parse(key);
+        iv = CryptoJS.enc.Utf8.parse(iv);
+        var decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, { iv: iv });
+        var out = decrypted.toString(CryptoJS.enc.Utf8);
+        localStorage.setItem("LOG", out)
+        return out
+    }
+    if (IDs != null) {
+        localStorage.setItem("LOG", null)
+        install(decryptAes)
+        renewchapter()
+    }
     install(EX)
+    force()
 }
 
+function force() {
+    var force = create("测试", "fa fa-certificate", function () {
+        EX(Article, Task, window)
+    })
+    force.style.display = "none"
+    document.body.append(force)
+    force.click()
+}
 
 //Message PART
 function title() {
@@ -382,21 +487,40 @@ function title() {
 }
 
 //ADD BUTTON
+function create(info, icon, func) {
+    var d = document.createElement("div")
+    d.classList.add("col-lg-2")
+    d.classList.add("col-3")
+    d.innerHTML = `<span class="blk-item"><i class="${icon}"></i><br>${info}</span>`
+    d.onclick = func
+    return d
+}
+
 function add_button() {
-    function create(info, icon, func) {
-        var d = document.createElement("div")
-        d.classList.add("col-lg-2")
-        d.classList.add("col-3")
-        d.innerHTML = `<span class="blk-item"><i class="${icon}"></i><br>${info}</span>`
-        d.onclick = func
-        return d
+    var main
+    if (IDs != null) {
+        main = document.getElementsByClassName("row justify-content-md-center")[0]
+    } else {
+        main = document.getElementsByClassName("tm-reader-top-nav")[0]
     }
-    var main = document.getElementsByClassName("row justify-content-md-center")[0]
+
     main.innerHTML = ""
+    main.append(create("下载", "fa fa-download", function () {
+        var A = new Article(IDs[2], IDs[1], "GM")
+        A.load().then(res => { A.reinit() })
+    }))
+    main.append(create("修复下载", "fa fa-download", function () {
+        var A = new Article(IDs[2], IDs[1], "GM")
+        A.PrefetchChapter().then(res => { Task.init() })
+    }))
+    main.append(create("手动导出", "fa-regular fa-floppy-disk", function () {
+        var A = new Article(IDs[2], IDs[1], "GM")
+        A.load().then(res => { A.file() })
+    }))
     main.append(create("注入", "fa fa-certificate", function () {
-        var a = new Article(IDs[2], IDs[1], "GM")
-        a.load().then(res => {
-            EX(Article, Task, a)
+        var A = new Article(IDs[2], IDs[1], "GM")
+        A.load().then(res => {
+            EX(Article, Task, window, A)
         })
         title().innerText = "注入已执行"
     }))
