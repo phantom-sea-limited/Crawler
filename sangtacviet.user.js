@@ -11,6 +11,7 @@
 // @require      https://static.deception.world/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        GM_deleteValue
 // @grant        GM_log
 // @license      MIT
 // ==/UserScript==
@@ -208,9 +209,9 @@ class Article {
     async fetchChapter(i, j) {
         await this.load()
         var chap = this.chapterList[i].lists[j]
+        var content = document.getElementsByClassName("contentbox")[1]
         if (document.location.href == chap.href) {
-            if (chapterfetcher.responseText != "") {
-                var content = document.getElementsByClassName("contentbox")[1]
+            if (chapterfetcher.responseText != "" && content.innerHTML.contain("function()") == false) {
                 content.children[0].remove()
                 chap.content = content.innerHTML.replaceAll("<br>", "\n")
             } else {
@@ -234,7 +235,7 @@ class Article {
             this.chapterList.slice(1).forEach(chap => {
                 for (let k in chap.lists) {
                     var chapinfo = chap.lists[k]
-                    if (chapinfo['CanDownload'] != false && chapinfo["content"] == "") {
+                    if (chapinfo['CanDownload'] != false && (chapinfo["content"] == "" || chapinfo["content"].contain("function()"))) {
                         tasklists.unshift(Task.create(this.ID, this.ori, [`await A.fetchChapter(${i},${k})`], this.mode))
                     }
                 }
@@ -282,7 +283,7 @@ class Article {
             } else {
                 var tmp = await Article.GM_config(this.ID)
                 if (tmp == null) { tmp = Article.localconfig(this.ID) }
-                if (tmp == null) { tmp = Article.localforge(this.ID) }
+                if (tmp == null) { tmp = await Article.localforge(this.ID) }
             }
 
             if (tmp != null) {
@@ -527,6 +528,9 @@ function add_button() {
         main.append(create("手动导出", "fa fa-floppy-o", function () {
             var A = new Article(IDs[2], IDs[1], "GM")
             A.load().then(res => { A.file() })
+        }))
+        main.append(create("清除缓存", "fa fa-times", function () {
+            GM.deleteValue(IDs[2]);
         }))
         main.append(create("注入", "fa fa-certificate", function () {
             var A = new Article(IDs[2], IDs[1], "GM")

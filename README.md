@@ -2,11 +2,40 @@
 
 快速目录
 
-1. [nhimmeocf-刺猬猫分享](#nhimmeocf-刺猬猫分享)
-2. [轻之国度](#轻之国度)
-3. [同人小说通用](#同人小说通用)
-4. [imwcr](#imwcr)
-5. [已失效内容](#已失效内容)
+1. [sangtacviet](#sangtacviet)
+2. [nhimmeocf-刺猬猫分享](#nhimmeocf-刺猬猫分享)
+3. [轻之国度](#轻之国度)
+4. [同人小说通用](#同人小说通用)
+5. [imwcr](#imwcr)
+6. [已失效内容](#已失效内容)
+
+# **sangtacviet**
+
+### 相关文件
+
+> sangtacviet.user.js
+>
+> sangtacviet.py
+
+**使用说明**
+
+请使用[Tampermonkey](https://www.tampermonkey.net/)安装此用户脚本
+
+[**点击安装脚本**](https://github.com/phantom-sea-limited/Crawler/raw/main/sangtacviet.user.js)
+
+[**点击安装脚本(镜像)**](https://static.deception.world/https://github.com/phantom-sea-limited/Crawler/raw/main/sangtacviet.user.js)
+
+安装后，在**ciweimao/sfacg(暂未支持)**书籍页面会出现一个黑色的下载框，点击就会自动操作，如果点击后没有反应，可以打开控制台康康有没有报错
+
+1. 在sangtacviet.vip书籍详情页面，点击下载相关黑色系按钮
+
+2. 在执行完之后，会产生一个包含所有信息的json文件，由于目前没做js的epub打包，可以先用python版本的
+
+3. 执行`python sangtacviet.py ****.json`打包epub，过程中会下载一些网络图片，请静候
+
+4. 在`.tmp`目录下找到成品
+
+[**高级说明**](https://github.com/phantom-sea-limited/Crawler/blob/main/sangtacviet.md)
 
 # **nhimmeo.cf 刺猬猫分享**
 
