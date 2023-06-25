@@ -42,6 +42,8 @@ class Article {
             [
                 Task.createBymethod(this.ID, this.ori, "fetchInfo", this.mode),
                 Task.createBymethod(this.ID, this.ori, "fetchCatalog", this.mode),
+                Task.createBymethod(this.ID, this.ori, "translateCatalog", this.mode),
+                Task.createBymethod(this.ID, this.ori, "translateInfo", this.mode),
                 Task.createBymethod(this.ID, this.ori, "PrefetchChapter", this.mode),
                 Task.createBymethod(this.ID, this.ori, "file", this.mode),
             ]
@@ -57,6 +59,8 @@ class Article {
                 [
                     Task.createBymethod(this.ID, this.ori, "fetchInfo", this.mode),
                     Task.createBymethod(this.ID, this.ori, "fetchCatalog", this.mode),
+                    Task.createBymethod(this.ID, this.ori, "translateCatalog", this.mode),
+                    Task.createBymethod(this.ID, this.ori, "translateInfo", this.mode),
                     Task.createBymethod(this.ID, this.ori, "PrefetchChapter", this.mode),
                     Task.createBymethod(this.ID, this.ori, "file", this.mode),
                 ]
@@ -87,8 +91,10 @@ class Article {
             var log = localStorage.getItem("LOG")
             if (log == null) {
                 insert()
+                window.Task_STOP = true
                 await sleep(5000)
                 await this.fetchCatalog()
+                window.Task_STOP = false
             } else {
                 // var oldchaperList = [...this.chapterList]
                 this.chapterList = []
@@ -203,13 +209,15 @@ class Article {
         await this.load()
         var chap = this.chapterList[i].lists[j]
         if (document.location.href == chap.href) {
-            if (chapterfetcher.responseText != null) {
+            if (chapterfetcher.responseText != "") {
                 var content = document.getElementsByClassName("contentbox")[1]
                 content.children[0].remove()
                 chap.content = content.innerHTML.replaceAll("<br>", "\n")
             } else {
+                window.Task_STOP = true
                 await sleep(1000)
                 await this.fetchChapter(i, j)
+                window.Task_STOP = false
             }
         } else {
             await Task.add(Task.create(this.ID, this.ori, [`await A.fetchChapter(${i},${j})`], this.mode), "push")
@@ -377,12 +385,14 @@ class Task {
         var commands = window.Task_info
         var command;
         if (commands != null) {
-            if (commands.length != 0 && window.Task_STOP != true) {
-                command = commands.pop()
-                eval(command)
-                GM_log(command)
-                await Task.localconfig(commands)
-                setTimeout(Task.init, 200)
+            if (commands.length != 0) {
+                if (window.Task_STOP != true) {
+                    command = commands.pop()
+                    eval(command)
+                    GM_log(command)
+                    await Task.localconfig(commands)
+                }
+                setTimeout(Task.init, 1000)
             }
         }
         GM_log("Task finish! waiting for another")
@@ -491,43 +501,55 @@ function create(info, icon, func) {
     var d = document.createElement("div")
     d.classList.add("col-lg-2")
     d.classList.add("col-3")
-    d.innerHTML = `<span class="blk-item"><i class="${icon}"></i><br>${info}</span>`
+    d.innerHTML = `<span class="blk-item"><i class="${icon}"></i>${info}</span>`
     d.onclick = func
     return d
 }
 
 function add_button() {
     var main
+    var css = document.createElement("link")
+    css.rel = 'stylesheet'
+    css.href = "https://static.deception.world/https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    document.body.append(css)
+
     if (IDs != null) {
         main = document.getElementsByClassName("row justify-content-md-center")[0]
+        main.innerHTML = ""
+        main.append(create("下载", "fa fa-download", function () {
+            var A = new Article(IDs[2], IDs[1], "GM")
+            A.load().then(res => { A.reinit() })
+        }))
+        main.append(create("修复下载", "fa fa-download", function () {
+            var A = new Article(IDs[2], IDs[1], "GM")
+            A.PrefetchChapter().then(res => { Task.init() })
+        }))
+        main.append(create("手动导出", "fa fa-floppy-o", function () {
+            var A = new Article(IDs[2], IDs[1], "GM")
+            A.load().then(res => { A.file() })
+        }))
+        main.append(create("注入", "fa fa-certificate", function () {
+            var A = new Article(IDs[2], IDs[1], "GM")
+            A.load().then(res => {
+                EX(Article, Task, window, A)
+            })
+            title().innerText = "注入已执行"
+        }))
     } else {
-        main = document.getElementsByClassName("tm-reader-top-nav")[0]
+        // main = document.getElementById("tm-nav-search-logo").parentElement
+        // main = document.getElementById("tm-nav-search-top-right")
+        main = document.getElementsByClassName("input-group")[0]
+        main.append(create("终止任务", "fa fa-times", function () {
+            window.Task_STOP = true
+            window.Task_info = []
+            Task.localconfig([])
+            title().innerText = "任务已终止"
+        }))
     }
-
-    main.innerHTML = ""
-    main.append(create("下载", "fa fa-download", function () {
-        var A = new Article(IDs[2], IDs[1], "GM")
-        A.load().then(res => { A.reinit() })
-    }))
-    main.append(create("修复下载", "fa fa-download", function () {
-        var A = new Article(IDs[2], IDs[1], "GM")
-        A.PrefetchChapter().then(res => { Task.init() })
-    }))
-    main.append(create("手动导出", "fa-regular fa-floppy-disk", function () {
-        var A = new Article(IDs[2], IDs[1], "GM")
-        A.load().then(res => { A.file() })
-    }))
-    main.append(create("注入", "fa fa-certificate", function () {
-        var A = new Article(IDs[2], IDs[1], "GM")
-        A.load().then(res => {
-            EX(Article, Task, window, A)
-        })
-        title().innerText = "注入已执行"
-    }))
 }
 
 async function add_task_status() {
-    var l = await Task.localconfig()
+    var l = window.Task_info
     var msg
     if (l == null) { msg = "任务已完成" }
     else if (l.length != 0) { msg = `任务剩余${l.length}` }
