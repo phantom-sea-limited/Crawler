@@ -12,6 +12,7 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_deleteValue
+// @grant        GM_listValues
 // @grant        GM_log
 // @license      MIT
 // ==/UserScript==
@@ -413,8 +414,10 @@ function check() {
     GM_log("Start checking!")
     try {
         if (document.location.hostname == "sangtacviet.vip") {
-            if (document.body.innerText.contain("检查站点连接是否安全") || document.body.innerText.contain("Error code")) {
+            if (document.body.innerText.contain("检查站点连接是否安全")) {
                 setTimeout(check, 2000)
+            } else if (document.body.innerText.contain("Error code")) {
+                document.location.href = document.location.href
             } else {
                 run()
             }
@@ -531,6 +534,16 @@ function add_button() {
         }))
         main.append(create("清除缓存", "fa fa-times", function () {
             GM.deleteValue(IDs[2]);
+            title().innerText = "缓存已清除"
+        }))
+        main.append(create("清除所有缓存", "fa fa-times", async function () {
+            const asyncKeys = await GM.listValues();
+            asyncKeys.forEach(key => {
+                if (key != "Task") {
+                    GM_deleteValue(key)
+                }
+            })
+            title().innerText = "所有缓存已清除"
         }))
         main.append(create("注入", "fa fa-certificate", function () {
             var A = new Article(IDs[2], IDs[1], "GM")
@@ -539,6 +552,15 @@ function add_button() {
             })
             title().innerText = "注入已执行"
         }))
+        // main.append(create("测试", "fa fa-certificate", async function () {
+        //     const asyncKeys = await GM.listValues();
+        //     asyncKeys.forEach(key => {
+        //         if (key != "Task") {
+        //             GM.deleteValue(key)
+        //         }
+        //     })
+        //     title().innerText = "测试已执行"
+        // }))
     } else {
         // main = document.getElementById("tm-nav-search-logo").parentElement
         // main = document.getElementById("tm-nav-search-top-right")

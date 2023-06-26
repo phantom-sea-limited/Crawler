@@ -37,6 +37,10 @@ function force() {
 }   // 一些函数层级和调用方式的更改都会导致外泄失效，不知道为什么
 ```
 
+爬虫核心类为    `window.STV.Article`，任务调度机制为    `window.STV.Task`，均可以在控制台直接使用
+
+额外的`window.STV.window`是爬虫的运行环境(Proxy)
+
 ## sangtacviet.user.js
 
 **新增相关方法如下：**
@@ -84,6 +88,9 @@ class Task{
 ~~表现为，在上一段`eval()`未执行完成前就执行下一段(很神秘，实际上你单独去测试，是正常的)~~
 
 (其实也，不能这么说，更严谨的描述应该是：在上一个章节的获取还没完成之前，任务调度系统就已经前往了下一个目的端)
+
+更明确一点来说是，在`document.location.href`更改之后，在新的页面加载前，前一个页面的js将会持续运行
+
 
 ```js
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
