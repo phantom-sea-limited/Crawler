@@ -46,9 +46,9 @@ function force() {
 **新增相关方法如下：**
 
 ```js
-A = new Article(ID, ori)     // ID为书籍ID, ori为来源
-await A.translateCatalog()   // 翻译目录
-await A.translateInfo()      // 翻译信息
+A = new Article(ID, ori, "GM")     // ID为书籍ID, ori为来源，GM用于指定数据存储为tampermonkey，其余的可选项不可使用!
+await A.translateCatalog()         // 翻译目录
+await A.translateInfo()            // 翻译信息
 ```
 
 [**常规方法说明(nhimmeo)**](https://github.com/phantom-sea-limited/Crawler/blob/main/nhimmeo.md)

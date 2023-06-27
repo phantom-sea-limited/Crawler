@@ -277,11 +277,12 @@ setTimeout(check_Task_status, 5000)
 function check_Task_status() {
     if (window.Task_statu != "installed") {
         window.onload()
+        setTimeout(check_Task_status, 5000)
     }
 }
 
 function add_task_status() {
-    var l = Task.localconfig()
+    var l = window.Task_info
     var msg
     if (l == null) { msg = "任务已完成" }
     else if (l.length != 0) { msg = `任务剩余${l.length}` }
