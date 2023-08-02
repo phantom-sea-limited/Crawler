@@ -3,6 +3,25 @@ import json
 import re
 from Lib.Epub import Epub
 
+
+def find_src(k):
+    try:
+        return re.findall(r'''<img src="([\s\S]+?)" ''', k)[0]
+    except:
+        print(f"[WARNING]:\t failed using Default regular expression \t {k}")
+    try:
+        return re.findall(r'''<img alt="([\s\S]+?)" src="([\s\S]+?)"''', k)[0][1]
+    except:
+        print(f"[WARNING]:\t failed using Senior regular expression \t {k}")
+    try:
+        tmp = re.findall(r'''src="([\s\S]+?)"''', k)[0]
+        print(f"[WARNING]:\t failed using Unsafety regular expression \t {k}")
+        return tmp
+    except:
+        print(
+            f"[Critical]:\t can not find the src with all regular expression \t {k}")
+
+
 if len(sys.argv) != 2:
     print("缺失json文件")
 else:
@@ -38,7 +57,7 @@ else:
                     text[0]['lines'].append(
                         {
                             "type": "img",
-                            "item": re.findall(r'''<img src="([\s\S]+?)" ''', k)[0]
+                            "item": find_src(k)
                         }
                     )
             e.add_text(text)
