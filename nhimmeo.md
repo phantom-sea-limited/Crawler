@@ -4,7 +4,7 @@
 
 高级说明仅面向高级用户(对js有了解)
 
-爬虫核心类为    `window.Article`，任务调度机制为    `window.Task`，均可以在控制台直接使用
+爬虫核心类为    `window.nhimmeo.Article`，任务调度机制为    `window.nhimmeo.Task`，均可以在控制台直接使用
 
 **相关方法如下：**
 

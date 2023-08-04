@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         lightnovel.us下载工具
-// @namespace    https://www.lightnovel.us/
+// @namespace    Rcrwrate
 // @version      1.0
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate

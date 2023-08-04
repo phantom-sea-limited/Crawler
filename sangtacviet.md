@@ -6,7 +6,10 @@
 
 2. 采用新的激活机制，提高效率
 
-3. 由于一旦引入tampermonkey相关函数，tampermonkey就会给脚本一个Proxy运行环境，为了让Task和Article类被泄露至页面，采用了一个奇怪的设计
+3. ~~由于一旦引入tampermonkey相关函数，tampermonkey就会给脚本一个Proxy运行环境，为了让Task和Article类被泄露至页面，采用了一个奇怪的设计~~已经使用unsafeWindow解决
+
+<details>
+<summary>奇怪的旧代码</summary>
 
 ```js
 //insert JS into Page
@@ -36,6 +39,7 @@ function force() {
     force.click()
 }   // 一些函数层级和调用方式的更改都会导致外泄失效，不知道为什么
 ```
+</details>
 
 爬虫核心类为    `window.STV.Article`，任务调度机制为    `window.STV.Task`，均可以在控制台直接使用
 

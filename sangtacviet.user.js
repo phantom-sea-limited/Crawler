@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
-// @namespace    https://sangtacviet.vip/
-// @version      1.0
+// @namespace    Rcrwrate
+// @version      1.1
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
@@ -14,6 +14,7 @@
 // @grant        GM_deleteValue
 // @grant        GM_listValues
 // @grant        GM_log
+// @grant        unsafeWindow
 // @license      MIT
 // ==/UserScript==
 
@@ -457,13 +458,13 @@ function insert() {
         s.innerHTML = func.toString()
         document.body.append(s)
     }
-    function EX(a, b, c, d = null) {
-        window.STV = {}
-        window.STV.Article = a
-        window.STV.Task = b
-        window.STV.window = c
-        window.a = d
-    }
+    // function EX(a, b, c, d = null) {
+    //     window.STV = {}
+    //     window.STV.Article = a
+    //     window.STV.Task = b
+    //     window.STV.window = c
+    //     window.a = d
+    // }
     function decryptAes(encrypted, key, iv) {
         encrypted = CryptoJS.enc.Base64.parse(encrypted);
         key = CryptoJS.enc.Utf8.parse(key);
@@ -478,18 +479,23 @@ function insert() {
         install(decryptAes)
         renewchapter()
     }
-    install(EX)
-    force()
+
+    //  旧代码，暴力注入
+    // install(EX)
+    // force()
+    window.Article = Article
+    window.Task = Task
+    unsafeWindow.STV = window
 }
 
-function force() {
-    var force = create("测试", "fa fa-certificate", function () {
-        EX(Article, Task, window)
-    })
-    force.style.display = "none"
-    document.body.append(force)
-    force.click()
-}
+// function force() {
+//     var force = create("测试", "fa fa-certificate", function () {
+//         EX(Article, Task, window)
+//     })
+//     force.style.display = "none"
+//     document.body.append(force)
+//     force.click()
+// }
 
 //Message PART
 function title() {

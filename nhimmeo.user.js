@@ -1,13 +1,16 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
-// @namespace    https://zh.nhimmeo.cf/
-// @version      1.5
+// @namespace    Rcrwrate
+// @version      1.6
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
+// @require      https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.11.1.min.js
 // @require      https://static.deception.world/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
+// @require      https://static.deception.world/https://fezvrasta.github.io/snackbarjs/dist/snackbar.min.js
 // @icon         https://api.phantom-sea-limited.ltd/favicon.ico
-// @grant        none
+// @grant        GM_log
+// @grant        unsafeWindow
 // @license      MIT
 // ==/UserScript==
 
@@ -263,12 +266,12 @@ class Task {
             if (commands.length != 0 && window.Task_STOP != true) {
                 command = commands.pop()
                 eval(command)
-                console.log(command)
+                notice.push(command, Notice.DEBUG)
                 Task.localconfig(commands)
                 setTimeout(Task.init, 200)
             }
         }
-        console.log("Task finish! waiting for another")
+        notice.push("Task finish! waiting for another", Notice.INFO)
     }
 
     static localconfig(msg = '') {
@@ -281,24 +284,107 @@ class Task {
 }
 window.Task_info = Task.localconfig()
 
+
+class Notice {
+    static DEBUG = 0
+    static INFO = 10
+    static WARNING = 20
+    static ERROR = 30
+    static Critical = 40
+    static NoLog = 50
+    static console = "C"
+    static GM_log = "G"
+    static snackbar = "S"
+    c_tr = { 0: "debug", 10: "info", 20: "warn", 30: "error", 40: "error" }
+    g_tr = { 0: "[DEBUG]", 10: "[INFO]", 20: "[WARN]", 30: "[ERROR]", 40: "[Critical]" }
+    s_tr = { 0: "grey", 10: "blue", 20: "warn", 30: "error", 40: "error" }
+
+    constructor(loglevel = Notice.INFO, method = [Notice.GM_log, Notice.console, Notice.snackbar]) {
+        this.loglevel = loglevel
+        this.method = method
+    }
+
+    push(msg, level) {
+        if (level >= this.loglevel) {
+            this.method.forEach((e) => {
+                this[e](msg, level)
+            })
+        }
+    }
+
+    G(msg, level) {
+        GM_log(`${this.g_tr[level]}\t${msg}`)
+    }
+
+    C(msg, level) {
+        console[this.c_tr[level]](msg)
+    }
+
+    S(msg, level) {
+        $.snackbar({
+            content: msg, // text of the snackbar
+            style: `toast ${this.s_tr[level]}`, // add a custom class to your snackbar
+            timeout: 1000 // time in milliseconds after the snackbar autohides, 0 is disabled
+        })
+    }
+}
+window.notice = new Notice(Notice.DEBUG, [Notice.console, Notice.snackbar])
+
+//INIT
+setTimeout(install)
+setTimeout(check)
+setTimeout(() => { if (document.readyState != "complete") { document.location.href = document.location.href } }, 15000)
+function check() {
+    notice.push("Start checking!", Notice.DEBUG)
+    try {
+        if (document.body.innerText.includes("Error code")) {
+            document.location.href = document.location.href
+        }
+        else if (document.body.innerText.includes("请勿往国内社区流传。感谢。")) {
+            run()
+        } else {
+            setTimeout(check, 2000)
+        }
+    } catch {
+        setTimeout(check, 2000)
+    }
+}
+
+function install() {
+    var css = document.createElement("link")
+    css.rel = 'stylesheet'
+    css.href = "https://static.deception.world/https://fezvrasta.github.io/snackbarjs/dist/snackbar.min.css"
+    document.body.append(css)
+    css = document.createElement("style")
+    css.innerHTML = `
+    .blue {
+    background-color: #479ad0;
+    }
+    .grey {
+        background-color: #878787;
+    }
+    .warn {
+        background-color: #7350af;
+    }
+    .error {
+        background-color: #d50a0a;
+    }
+    `
+    document.body.append(css)
+}
+
 window.Article = Article
 window.Task = Task
-window.Task_statu = null
-window.onload = function _init() {
-    window.Task_statu = "installed"
+unsafeWindow.nhimmeo = window
+
+
+function run() {
     add_button()
     var exp = new Date();
     exp.setTime(exp.getTime() + 1 * 24 * 60 * 60 * 1000 * 365);
     document.cookie = 'auto_use_chapter_vip=on ;path=/ ;expires=' + exp.toGMTString();
     setTimeout(Task.init)
-}
-
-setTimeout(check_Task_status, 5000)
-function check_Task_status() {
-    if (window.Task_statu != "installed") {
-        window.onload()
-        setTimeout(check_Task_status, 5000)
-    }
+    notice.push("Start running!", Notice.DEBUG)
 }
 
 function add_task_status() {
@@ -309,12 +395,12 @@ function add_task_status() {
     else { msg = "任务已完成" }
     var a = $(".fa-coffee")[0]
     // a.nextElementSibling.href = null
+    notice.push(msg, 10)
     a.nextElementSibling.innerText = msg
     if (msg != "任务已完成") {
         setTimeout(add_task_status, 2000)
     }
 }
-
 
 function add_button() {
     var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)

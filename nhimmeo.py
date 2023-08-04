@@ -15,7 +15,7 @@ def find_src(k):
         print(f"[WARNING]:\t failed using Senior regular expression \t {k}")
     try:
         tmp = re.findall(r'''src="([\s\S]+?)"''', k)[0]
-        print(f"[WARNING]:\t failed using Unsafety regular expression \t {k}")
+        print(f"[WARNING]:\t using Unsafety regular expression \t {k}")
         return tmp
     except:
         print(
