@@ -37,6 +37,18 @@
 
 4. 在`.tmp`目录下找到成品
 
+**中文显示**
+
+在搜索界面支持ciweimao/sfacg/linovel/wenku8的中文显示
+[传送门](https://sangtacviet.vip/?find=&host=&minc=0&tag=)
+
+**TIPS:当然，你也可以使用控制台使用:`STV.search_helper_handler()`**
+
+以wenku8为例
+
+![image](https://github.com/phantom-sea-limited/Crawler/assets/46920034/05012acc-fe67-42d2-8df9-ec1905a9f2c6)
+
+
 [**高级说明**](https://github.com/phantom-sea-limited/Crawler/blob/main/sangtacviet.md)
 
 # **nhimmeo.cf 刺猬猫分享**
@@ -54,8 +66,6 @@
 [请合理使用爬虫](https://ko-fi.com/post/For-Chinese-users-D1D1LZSTG)
 
 [如果可以的话，赞助一下这位站长](https://ko-fi.com/post/Alipay-Q5Q2M70VM)
-
-[身份验证:这个人是我.jpg](https://ko-fi.com/Rcrwrate)
 
 **使用说明**
 

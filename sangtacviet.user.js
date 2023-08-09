@@ -14,7 +14,13 @@
 // @grant        GM_deleteValue
 // @grant        GM_listValues
 // @grant        GM_log
+// @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
+// @connect      book.sfacg.com
+// @connect      mip.ciweimao.com
+// @connect      wap.ciweimao.com
+// @connect      www.linovel.net
+// @connect      www.wenku8.net
 // @license      MIT
 // ==/UserScript==
 
@@ -448,6 +454,9 @@ function run() {
     setTimeout(insert)
     setTimeout(Task.init)
     setTimeout(add_task_status)
+    setTimeout(search_helper)
+    setTimeout(search_first)
+    setTimeout(search.init)
 }
 
 //insert JS into Page
@@ -590,4 +599,146 @@ async function add_task_status() {
     if (msg != "任务已完成") {
         setTimeout(add_task_status, 2000)
     }
+}
+
+async function search_helper() {
+    if (document.location.pathname === "/") {
+        var js = document.createElement("script")
+        js.innerHTML = `function doquery(isnew){
+            createquery(isnew);
+            //location="/"+query;
+            ui.swiftload("/"+query,"searchbutton");
+            ui.scrollto("searchbutton",50);
+            setTimeout(window.STV.search_helper_handler, 2000)
+        }`
+        document.body.append(js)
+    }
+}
+
+function search_first() {
+    if (document.location.pathname === "/") {
+        setTimeout(search_helper_handler, 2000)
+    }
+}
+
+const search = {
+    init: () => Article.GM_config("Helper").then((r) => {
+        if (r != null) { search.data = r }
+    }),
+    data: {
+        sfacg: {},
+        ciweimao: {},
+        linovel: {},
+        wenku8: {}
+    },
+    ciweimao: (ID, dom) => {
+        if (search.data.ciweimao[ID] == undefined) {
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: `https://mip.ciweimao.com/book/${ID}`,
+                headers: {
+                    "Accept": "text/html"
+                },
+                onload: function (response) {
+                    if (response.status == 200) {
+                        var n = response.responseText.match(/<span class="book-name">(.*)<\/span>/)[1]
+                        console.log(n)
+                        dom.children[1].children[0].innerText = n
+                        search.data.ciweimao[ID] = n
+                        Article.GM_config("Helper", search.data)
+                    }
+                }
+            });
+        } else {
+            dom.children[1].children[0].innerText = search.data.ciweimao[ID]
+        }
+    },
+    sfacg: (ID, dom) => {
+        if (search.data.sfacg[ID] == undefined) {
+            GM_xmlhttpRequest({
+                method: "POST",
+                url: "https://book.sfacg.com/ajax/ashx/Common.ashx?op=ticketinfo",
+                data: `nid=${ID}`,
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                },
+                onload: function (response) {
+                    var r = JSON.parse(response.responseText)
+                    if (r.status == 200) {
+                        dom.children[1].children[0].innerText = r.tickets.NovelName
+                        search.data.sfacg[ID] = r.tickets.NovelName
+                        Article.GM_config("Helper", search.data)
+                    }
+                    console.log(r);
+                }
+            });
+        } else {
+            dom.children[1].children[0].innerText = search.data.sfacg[ID]
+        }
+    },
+    linovel: (ID, dom) => {
+        if (search.data.linovel[ID] == undefined) {
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: `https://www.linovel.net/book/${ID}.html`,
+                headers: {
+                    "Accept": "text/html"
+                },
+                onload: function (response) {
+                    if (response.status == 200) {
+                        var n = response.responseText.match(/<meta property="og:title" content="(.*)" \/>/)[1]
+                        console.log(n)
+                        dom.children[1].children[0].innerText = n
+                        search.data.linovel[ID] = n
+                        Article.GM_config("Helper", search.data)
+                    }
+                }
+            });
+        } else {
+            dom.children[1].children[0].innerText = search.data.linovel[ID]
+        }
+    },
+    wenku8: (ID, dom) => {
+        if (search.data.wenku8[ID] == undefined) {
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: `https://www.wenku8.net/book/${ID}.htm`,
+                headers: {
+                    "Accept": "text/html"
+                },
+                responseType: "arraybuffer",
+                onload: function (response) {
+                    if (response.status == 200) {
+                        var x = new Uint8Array(response.response);
+                        var str = new TextDecoder('gbk').decode(x)
+                        var n = str.match(/<b>《(.*)》/)[1]
+                        console.log(n)
+                        dom.children[1].children[0].innerText = n
+                        search.data.wenku8[ID] = n
+                        Article.GM_config("Helper", search.data)
+                    }
+                }
+            });
+        } else {
+            dom.children[1].children[0].innerText = search.data.wenku8[ID]
+        }
+    },
+    default: (dom) => {
+        var key = dom.href.match(/\/(ciweimao|sfacg|linovel|wenku8)\/\d+\/(\d+)\/$/)
+        if (key) {
+            search[key[1]](key[2], dom)
+        }
+    }
+}
+
+window.search = search
+window.search_helper_handler = search_helper_handler
+
+async function search_helper_handler() {
+    console.log("Helper running")
+    var books = document.getElementsByClassName("booksearch")
+    for (let i = 0; i < books.length; i++) {
+        search.default(books[i])
+    }
+    setTimeout(search_helper, 1000)
 }
