@@ -1,13 +1,15 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      1.1
+// @version      1.2
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
 // @match        https://zh.nhimmeo.cf/book/*
 // @match        https://wap.ciweimao.com/book/*
+// @match        https://m.sfacg.com/*
 // @icon         https://api.phantom-sea-limited.ltd/favicon.ico
+// @require      https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.js?v=1.4
 // @require      https://static.deception.world/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
 // @grant        GM_getValue
 // @grant        GM_setValue
@@ -145,6 +147,7 @@ class Article {
             if (document.body.innerText.includes("书籍不存在或未审核通过")) {
                 Article.more['c'] = "failed"
                 await Article.save()
+                await Article.translateCatalog()
             }
             if (document.location.href == `https://wap.ciweimao.com/book/${Article.ID}`) {
                 var main = document.getElementsByClassName("cnt-inner")[0]
@@ -195,8 +198,23 @@ class Article {
                 document.location.href = `https://zh.nhimmeo.cf/book/${Article.ID}/catalog/`
             }
         }
+        async function sf(Article) {
+            if (document.location.href == `https://m.sfacg.com/i/${Article.ID}/`) {
+                var all = document.getElementsByClassName("mulu")
+                for (let i = 0; i < all.length; i++) {
+                    var chaptitle = all[i];
+                    console.log(chaptitle)
+                }
+            } else {
+                await Task.add(Task.createBymethod(Article.ID, Article.ori, "translateCatalog", Article.mode), "push")
+                window.Task_STOP = true
+                document.location.href = `https://m.sfacg.com/i/${Article.ID}/`
+            }
+        }
+
         if (this.ori == "ciweimao" && this.more['c'] == undefined) { await c(this) }
         else if (this.ori == "ciweimao") { await c2(this) }
+        else if (this.ori == "sfacg") { await sf(this) }
     }
 
     async translateInfo() {
@@ -398,13 +416,13 @@ class Task {
                 if (window.Task_STOP != true) {
                     command = commands.pop()
                     eval(command)
-                    GM_log(command)
+                    window.notice.push(command, Notice.DEBUG)
                     await Task.localconfig(commands)
                 }
                 setTimeout(Task.init, 1000)
             }
         }
-        GM_log("Task finish! waiting for another")
+        window.notice.push("Task finish! waiting for another", Notice.DEBUG)
     }
 
     static async localconfig(msg = '') {
@@ -415,15 +433,66 @@ window.Task_info = await Task.localconfig()
 window.Task_statu = null
 
 
+class Notice {
+    static DEBUG = 0
+    static INFO = 10
+    static WARNING = 20
+    static ERROR = 30
+    static Critical = 40
+    static NoLog = 50
+    static console = "C"
+    static GM_log = "G"
+    static snackbar = "S"
+    c_tr = { 0: "debug", 10: "info", 20: "warn", 30: "error", 40: "error" }
+    g_tr = { 0: "[DEBUG]", 10: "[INFO]", 20: "[WARN]", 30: "[ERROR]", 40: "[Critical]" }
+    s_tr = { 0: "info", 10: "green", 20: "warning", 30: "danger", 40: "danger" }
+
+    constructor(loglevel = Notice.INFO, method = [Notice.GM_log, Notice.console, Notice.snackbar]) {
+        this.loglevel = loglevel
+        this.method = method
+    }
+
+    push(msg, level) {
+        if (level >= this.loglevel) {
+            this.method.forEach((e) => {
+                this[e](msg, level)
+            })
+        }
+    }
+
+    G(msg, level) {
+        GM_log(`${this.g_tr[level]}\t${msg}`)
+    }
+
+    C(msg, level) {
+        console[this.c_tr[level]](msg)
+    }
+
+    S(msg, level) {
+        // $.snackbar({
+        //     content: msg, // text of the snackbar
+        //     style: `toast ${this.s_tr[level]}`, // add a custom class to your snackbar
+        //     timeout: 1000 // time in milliseconds after the snackbar autohides, 0 is disabled
+        // })
+        window.SnackBar({
+            message: msg,
+            status: this.s_tr[level],
+            fixed: true
+        })
+    }
+}
+window.notice = new Notice(Notice.INFO, [Notice.snackbar, Notice.GM_log])
+window.SnackBar = SnackBar
+
 // INIT
 setTimeout(check)
 function check() {
-    GM_log("Start checking!")
+    window.notice.push("Start checking!", Notice.DEBUG)
     try {
         if (document.location.hostname == "sangtacviet.vip") {
             if (document.body.innerText.contain("检查站点连接是否安全")) {
                 setTimeout(check, 2000)
-            } else if (document.body.innerText.contain("Error code")) {
+            } else if (document.body.innerText.includes("Error code")) {
                 document.location.href = document.location.href
             } else {
                 run()
@@ -436,6 +505,8 @@ function check() {
             }
         } else if (document.location.hostname == "zh.nhimmeo.cf") {
             run()
+        } else if (document.location.hostname == "m.sfacg.com") {
+            run()
         }
     } catch {
         setTimeout(check, 2000)
@@ -446,7 +517,7 @@ function run() {
     var exp = new Date();
     exp.setTime(exp.getTime() + 1 * 24 * 60 * 60 * 1000 * 365);
     document.cookie = 'transmode=chinese	 ;path=/ ;expires=' + exp.toGMTString();
-    GM_log("Start running!")
+    window.notice.push("Start running!", Notice.DEBUG)
 
     var IDs = document.location.href.match(/\/(ciweimao|sfacg)\/\d+\/(\d+)\/$/)
     window.IDs = IDs
@@ -454,9 +525,10 @@ function run() {
     setTimeout(insert)
     setTimeout(Task.init)
     setTimeout(add_task_status)
+    setTimeout(search.init)
     setTimeout(search_helper)
     setTimeout(search_first)
-    setTimeout(search.init)
+    setTimeout(details_helper)
 }
 
 //insert JS into Page
@@ -515,6 +587,34 @@ function title() {
     }
 }
 
+setTimeout(insertCSS)
+function insertCSS() {
+    if (document.body != undefined) {
+        var css = document.createElement("link")
+        css.rel = 'stylesheet'
+        css.href = "https://static.deception.world/https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.css?v=1.4"
+        document.body.append(css)
+        css = document.createElement("style")
+        css.innerHTML = `
+        .blue {
+        background-color: #479ad0;
+        }
+        .grey {
+            background-color: #878787;
+        }
+        .warn {
+            background-color: #7350af;
+        }
+        .error {
+            background-color: #d50a0a;
+        }
+        `
+        document.body.append(css)
+    } else {
+        setTimeout(insertCSS)
+    }
+}
+
 //ADD BUTTON
 function create(info, icon, func) {
     var d = document.createElement("div")
@@ -549,7 +649,7 @@ function add_button() {
         }))
         main.append(create("清除缓存", "fa fa-times", function () {
             GM.deleteValue(IDs[2]);
-            title().innerText = "缓存已清除"
+            window.notice.push("缓存已清除!", Notice.INFO)
         }))
         main.append(create("清除所有缓存", "fa fa-times", async function () {
             const asyncKeys = await GM.listValues();
@@ -558,14 +658,14 @@ function add_button() {
                     GM_deleteValue(key)
                 }
             })
-            title().innerText = "所有缓存已清除"
+            window.notice.push("所有缓存已清除!", Notice.INFO)
         }))
         main.append(create("注入", "fa fa-certificate", function () {
             var A = new Article(IDs[2], IDs[1], "GM")
             A.load().then(res => {
-                EX(Article, Task, window, A)
+                window.A = A
             })
-            title().innerText = "注入已执行"
+            window.notice.push("注入已执行!", Notice.WARNING)
         }))
         // main.append(create("测试", "fa fa-certificate", async function () {
         //     const asyncKeys = await GM.listValues();
@@ -584,7 +684,7 @@ function add_button() {
             window.Task_STOP = true
             window.Task_info = []
             Task.localconfig([])
-            title().innerText = "任务已终止"
+            window.notice.push("任务已终止!", Notice.WARNING)
         }))
     }
 }
@@ -595,12 +695,13 @@ async function add_task_status() {
     if (l == null) { msg = "任务已完成" }
     else if (l.length != 0) { msg = `任务剩余${l.length}` }
     else { msg = "任务已完成" }
-    title().innerText = msg
+    window.notice.push(msg, Notice.INFO)
     if (msg != "任务已完成") {
         setTimeout(add_task_status, 2000)
     }
 }
 
+//Helper
 async function search_helper() {
     if (document.location.pathname === "/") {
         var js = document.createElement("script")
@@ -643,14 +744,14 @@ const search = {
                     if (response.status == 200) {
                         var n = response.responseText.match(/<span class="book-name">(.*)<\/span>/)[1]
                         console.log(n)
-                        dom.children[1].children[0].innerText = n
+                        dom.innerText = n
                         search.data.ciweimao[ID] = n
                         Article.GM_config("Helper", search.data)
                     }
                 }
             });
         } else {
-            dom.children[1].children[0].innerText = search.data.ciweimao[ID]
+            dom.innerText = search.data.ciweimao[ID]
         }
     },
     sfacg: (ID, dom) => {
@@ -665,7 +766,7 @@ const search = {
                 onload: function (response) {
                     var r = JSON.parse(response.responseText)
                     if (r.status == 200) {
-                        dom.children[1].children[0].innerText = r.tickets.NovelName
+                        dom.innerText = r.tickets.NovelName
                         search.data.sfacg[ID] = r.tickets.NovelName
                         Article.GM_config("Helper", search.data)
                     }
@@ -673,7 +774,7 @@ const search = {
                 }
             });
         } else {
-            dom.children[1].children[0].innerText = search.data.sfacg[ID]
+            dom.innerText = search.data.sfacg[ID]
         }
     },
     linovel: (ID, dom) => {
@@ -688,14 +789,14 @@ const search = {
                     if (response.status == 200) {
                         var n = response.responseText.match(/<meta property="og:title" content="(.*)" \/>/)[1]
                         console.log(n)
-                        dom.children[1].children[0].innerText = n
+                        dom.innerText = n
                         search.data.linovel[ID] = n
                         Article.GM_config("Helper", search.data)
                     }
                 }
             });
         } else {
-            dom.children[1].children[0].innerText = search.data.linovel[ID]
+            dom.innerText = search.data.linovel[ID]
         }
     },
     wenku8: (ID, dom) => {
@@ -713,20 +814,20 @@ const search = {
                         var str = new TextDecoder('gbk').decode(x)
                         var n = str.match(/<b>《(.*)》/)[1]
                         console.log(n)
-                        dom.children[1].children[0].innerText = n
+                        dom.innerText = n
                         search.data.wenku8[ID] = n
                         Article.GM_config("Helper", search.data)
                     }
                 }
             });
         } else {
-            dom.children[1].children[0].innerText = search.data.wenku8[ID]
+            dom.innerText = search.data.wenku8[ID]
         }
     },
     default: (dom) => {
         var key = dom.href.match(/\/(ciweimao|sfacg|linovel|wenku8)\/\d+\/(\d+)\/$/)
         if (key) {
-            search[key[1]](key[2], dom)
+            search[key[1]](key[2], dom.children[1].children[0])
         }
     }
 }
@@ -735,10 +836,17 @@ window.search = search
 window.search_helper_handler = search_helper_handler
 
 async function search_helper_handler() {
-    console.log("Helper running")
+    window.notice.push("Search Helper running", Notice.DEBUG)
     var books = document.getElementsByClassName("booksearch")
     for (let i = 0; i < books.length; i++) {
         search.default(books[i])
     }
     setTimeout(search_helper, 1000)
+}
+
+function details_helper() {
+    if (IDs != null) {
+        search[IDs[1]](IDs[2], title())
+        window.notice.push("Detail Helper running", Notice.DEBUG)
+    }
 }
