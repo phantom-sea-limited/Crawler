@@ -25,7 +25,7 @@
 
 [**点击安装脚本(镜像)**](https://static.deception.world/https://github.com/phantom-sea-limited/Crawler/raw/main/sangtacviet.user.js)
 
-安装后，在ciweimao/sfacg(暂未支持)书籍页面会出现一个黑色的下载框，点击就会自动操作，如果点击后没有反应，可以打开控制台康康有没有报错
+安装后，在ciweimao/sfacg/等等(未列出的来源未提供优化)书籍页面会出现一个黑色的下载框，点击就会自动操作，如果点击后没有反应，可以打开控制台康康有没有报错
 
 ![image](https://github.com/phantom-sea-limited/Crawler/assets/46920034/87383b46-d331-4203-a7d1-887b8404d17a)
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      1.5
+// @version      1.6
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
@@ -219,10 +219,18 @@ class Article {
                 document.location.href = `https://m.sfacg.com/i/${Article.ID}/`
             }
         }
+        async function fallback(Article) {
+            var all = Object.keys(Article.chapterList[0])
+            if (Article.chapterList[1] == undefined) { Article.chapterList[1] = { name: "默认", lists: {} } }
+            all.forEach((ID) => {
+                if (Article.chapterList[1]['lists'][ID] == undefined) { Article.chapterList[1]['lists'][ID] = Article.chapterList[0][ID] }
+            })
+        }
 
         if (this.ori == "ciweimao" && this.more['c'] == undefined) { await c(this) }
         else if (this.ori == "ciweimao") { await c2(this) }
         else if (this.ori == "sfacg") { await sf(this) }
+        else { await fallback(this) }
     }
 
     async translateInfo() {
@@ -733,7 +741,7 @@ async function search_helper() {
 }
 
 function search_first() {
-    if (document.location.pathname === "/") {
+    if (document.location.pathname === "/" || document.location.pathname === "/search/" ) {
         setTimeout(search_helper_handler, 2000)
     }
 }
