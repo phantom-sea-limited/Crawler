@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      1.2
+// @version      1.5
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
@@ -108,7 +108,7 @@ class Article {
                 window.Task_STOP = false
             } else {
                 // var oldchaperList = [...this.chapterList]
-                this.chapterList = []
+                // this.chapterList = []
                 var chaps = log.split("-//-")
                 var chaplist = {}
                 chaps.forEach(chap => {
@@ -129,10 +129,10 @@ class Article {
                             "CanDownload": CanDownload
                         }
                     } else {
-                        GM_log(chap)
+                        window.notice.push(chap, Notice.ERROR)
                     }
                 })
-                this.chapterList.push(chaplist)
+                this.chapterList[0] = chaplist
             }
         } else {
             await Task.add(Task.createBymethod(this.ID, this.ori, "fetchCatalog", this.mode), "push")
@@ -203,7 +203,15 @@ class Article {
                 var all = document.getElementsByClassName("mulu")
                 for (let i = 0; i < all.length; i++) {
                     var chaptitle = all[i];
-                    console.log(chaptitle)
+                    if (Article.chapterList[i + 1] == undefined) { Article.chapterList[i + 1] = { lists: {} } }
+                    Article.chapterList[i + 1].name = chaptitle.innerText
+                    var chaps = chaptitle.nextElementSibling.children[0].children
+                    for (let j = 0; j < chaps.length; j++) {
+                        const chap = chaps[j];
+                        var ID = chap.href.split("/")[4]
+                        if (Article.chapterList[i + 1]['lists'][ID] == undefined) { Article.chapterList[i + 1]['lists'][ID] = Article.chapterList[0][ID] }
+                        Article.chapterList[i + 1]['lists'][ID].name = chap.innerText
+                    }
                 }
             } else {
                 await Task.add(Task.createBymethod(Article.ID, Article.ori, "translateCatalog", Article.mode), "push")
@@ -229,7 +237,18 @@ class Article {
                 document.location.href = `https://wap.ciweimao.com/book/${Article.ID}`
             }
         }
+
+        async function sf(Article) {
+            if (document.location.href == `https://m.sfacg.com/b/${Article.ID}/`) {
+                Article.details = document.getElementsByClassName("book_profile")[0].innerText
+            } else {
+                await Task.add(Task.createBymethod(Article.ID, Article.ori, "translateInfo", Article.mode), "push")
+                window.Task_STOP = true
+                document.location.href = `https://m.sfacg.com/b/${Article.ID}/`
+            }
+        }
         if (this.ori == "ciweimao") { await c(this) }
+        else if (this.ori == "sfacg") { await sf(this) }
     }
 
     async fetchChapter(i, j) {
@@ -519,8 +538,9 @@ function run() {
     document.cookie = 'transmode=chinese	 ;path=/ ;expires=' + exp.toGMTString();
     window.notice.push("Start running!", Notice.DEBUG)
 
-    var IDs = document.location.href.match(/\/(ciweimao|sfacg)\/\d+\/(\d+)\/$/)
-    window.IDs = IDs
+    // var IDs = document.location.href.match(/\/(ciweimao|sfacg)\/\d+\/(\d+)\/$/)
+    // window.IDs = IDs
+    window.IDs = unsafeWindow.bookinfo
     setTimeout(add_button)
     setTimeout(insert)
     setTimeout(Task.init)
@@ -580,11 +600,7 @@ function insert() {
 
 //Message PART
 function title() {
-    if (IDs == null) {
-        return document.getElementById("tm-nav-search-top-right").children[0]
-    } else {
-        return document.getElementById("book_name2")
-    }
+    return document.getElementById("book_name2")
 }
 
 setTimeout(insertCSS)
@@ -636,19 +652,19 @@ function add_button() {
         main = document.getElementsByClassName("row justify-content-md-center")[0]
         main.innerHTML = ""
         main.append(create("下载", "fa fa-download", function () {
-            var A = new Article(IDs[2], IDs[1], "GM")
+            var A = new Article(IDs.id, IDs.host, "GM")
             A.load().then(res => { A.reinit() })
         }))
         main.append(create("修复下载", "fa fa-download", function () {
-            var A = new Article(IDs[2], IDs[1], "GM")
+            var A = new Article(IDs.id, IDs.host, "GM")
             A.PrefetchChapter().then(res => { Task.init() })
         }))
         main.append(create("手动导出", "fa fa-floppy-o", function () {
-            var A = new Article(IDs[2], IDs[1], "GM")
+            var A = new Article(IDs.id, IDs.host, "GM")
             A.load().then(res => { A.file() })
         }))
         main.append(create("清除缓存", "fa fa-times", function () {
-            GM.deleteValue(IDs[2]);
+            GM.deleteValue(IDs.id);
             window.notice.push("缓存已清除!", Notice.INFO)
         }))
         main.append(create("清除所有缓存", "fa fa-times", async function () {
@@ -661,7 +677,7 @@ function add_button() {
             window.notice.push("所有缓存已清除!", Notice.INFO)
         }))
         main.append(create("注入", "fa fa-certificate", function () {
-            var A = new Article(IDs[2], IDs[1], "GM")
+            var A = new Article(IDs.id, IDs.host, "GM")
             A.load().then(res => {
                 window.A = A
             })
@@ -834,6 +850,7 @@ const search = {
 
 window.search = search
 window.search_helper_handler = search_helper_handler
+window.details_helper = details_helper
 
 async function search_helper_handler() {
     window.notice.push("Search Helper running", Notice.DEBUG)
@@ -845,8 +862,11 @@ async function search_helper_handler() {
 }
 
 function details_helper() {
-    if (IDs != null) {
-        search[IDs[1]](IDs[2], title())
-        window.notice.push("Detail Helper running", Notice.DEBUG)
+    // if (IDs != null) {
+    //     search[IDs[1]](IDs[2], title())
+    //     window.notice.push("Detail Helper running", Notice.DEBUG)
+    // }
+    if (unsafeWindow.bookinfo != undefined) {
+        title().innerText = unsafeWindow.bookinfo.name
     }
 }

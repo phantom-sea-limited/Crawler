@@ -13,6 +13,29 @@ def remove_html_tags(text):
     return clean_text
 
 
+def remove_all_html_tags(text):
+    clean = re.compile('<.*?>')
+    return re.sub(clean, '', text).replace(" ", "")
+
+
+def find_src(k):
+    try:
+        return re.findall(r'''<img referrerpolicy="no-referrer" src="([\s\S]+?)">''', k)[0]
+    except:
+        print(f"[WARNING]:\t failed using Default regular expression \t {k}")
+    try:
+        return re.findall(r'''<img alt="([\s\S]+?)" src="([\s\S]+?)"''', k)[0][1]
+    except:
+        print(f"[WARNING]:\t failed using Senior regular expression \t {k}")
+    try:
+        tmp = re.findall(r'''src="([\s\S]+?)"''', k)[0]
+        print(f"[WARNING]:\t using Unsafety regular expression \t {k}")
+        return tmp
+    except:
+        print(
+            f"[Critical]:\t can not find the src with all regular expression \t {k}")
+
+
 if len(sys.argv) != 2:
     print("缺失json文件")
 else:
@@ -46,16 +69,21 @@ else:
                         "item": k
                     })
                 else:
-                    try:
+                    text[0]['lines'].append(
+                        {
+                            "type": "img",
+                            "item": find_src(k)
+                        }
+                    )
+                    k = remove_all_html_tags(k) # 部分跟在图片后的文本，影响不大
+                    if k != "":
                         text[0]['lines'].append(
                             {
-                                "type": "img",
-                                "item": re.findall(r'''<img referrerpolicy="no-referrer" src="([\s\S]+?)">''', k)[0]
+                                "type": "p",
+                                "item": k
                             }
                         )
-                    except:
-                        print(k)
-                        print(chap)
+
             e.add_text(text)
         i += 1
     e.finish()
