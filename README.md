@@ -27,7 +27,9 @@
 
 安装后，在ciweimao/sfacg/等等(未列出的来源未提供优化)书籍页面会出现一个黑色的下载框，点击就会自动操作，如果点击后没有反应，可以打开控制台康康有没有报错
 
-![image](https://github.com/phantom-sea-limited/Crawler/assets/46920034/87383b46-d331-4203-a7d1-887b8404d17a)
+![image](https://github.com/phantom-sea-limited/Crawler/assets/46920034/e7bffa86-cb0c-44f3-b79f-d8a6392df331)
+
+**已支持云端服务,将每一次用户的结果上传至终端,可以节约所有人的时间,希望各位保留这个功能.同时,所有文件均公开,可以通过上图所示按钮访问**
 
 1. 在sangtacviet.vip书籍详情页面，点击下载相关按钮
 
@@ -47,7 +49,6 @@
 以wenku8为例
 
 ![image](https://github.com/phantom-sea-limited/Crawler/assets/46920034/05012acc-fe67-42d2-8df9-ec1905a9f2c6)
-
 
 [**高级说明**](https://github.com/phantom-sea-limited/Crawler/blob/main/sangtacviet.md)
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      1.6
+// @version      1.7
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
@@ -23,6 +23,7 @@
 // @connect      wap.ciweimao.com
 // @connect      www.linovel.net
 // @connect      www.wenku8.net
+// @connect      api.phantom-sea-limited.ltd
 // @license      MIT
 // ==/UserScript==
 
@@ -57,6 +58,7 @@ class Article {
                 Task.createBymethod(this.ID, this.ori, "translateInfo", this.mode),
                 Task.createBymethod(this.ID, this.ori, "PrefetchChapter", this.mode),
                 Task.createBymethod(this.ID, this.ori, "file", this.mode),
+                `Cloud.UploadTask(${this.ID}, "${this.ori}", "${this.mode}")`
             ]
         )
         await this.save()
@@ -74,6 +76,7 @@ class Article {
                     Task.createBymethod(this.ID, this.ori, "translateInfo", this.mode),
                     Task.createBymethod(this.ID, this.ori, "PrefetchChapter", this.mode),
                     Task.createBymethod(this.ID, this.ori, "file", this.mode),
+                    `Cloud.UploadTask(${this.ID}, "${this.ori}", "${this.mode}")`
                 ]
             )
             setTimeout(Task.init, 200)
@@ -508,8 +511,127 @@ class Notice {
         })
     }
 }
+window.Notice = Notice
 window.notice = new Notice(Notice.INFO, [Notice.snackbar, Notice.GM_log])
 window.SnackBar = SnackBar
+
+const Cloud = {
+    chunkSize: 5 * 1024 * 1024,    // 5MB 切片大小，根据需要进行调整
+    init: false,
+    gtoken: undefined,
+    uploadSessionUrl: undefined,
+
+    file: (Article) => {
+        const jsonString = JSON.stringify(Article.output());
+        return new Blob([jsonString], { type: 'application/json' });
+    },
+
+    UploadTask: (ID, ori, mode) => {
+        install(function recaptcha_init_Callback() { grecaptcha.execute() })
+        Task.add(`Cloud.upload(${ID}, "${ori}", "${mode}")`)
+        Cloud.recaptcha_init()
+        window.Task_STOP = true
+        window.notice.push("正在将结果上传至云端,用于分享给其他用户,感谢您的慷慨", Notice.INFO)
+    },
+
+    recaptcha_init: () => {
+        if (!Cloud.init) {
+            function recaptcha_callback(e) {
+                STV.notice.push("人机验证成功!", STV.Notice.INFO)
+                STV.Cloud.gtoken = e
+                STV.Task_STOP = false
+                STV.Task.init()
+            }
+            var key = document.createElement("div")
+            key.dataset["sitekey"] = "6LdwBqEnAAAAAFW5q1vRrjxoy2igf4h0knhkChSI"
+            key.dataset["size"] = "invisible"
+            key.dataset['callback'] = "recaptcha_callback"
+            key.classList.add("g-recaptcha")
+            document.body.append(key)
+            install(recaptcha_callback)
+            var js = document.createElement('script')
+            js.src = "https://www.recaptcha.net/recaptcha/api.js?onload=recaptcha_init_Callback"
+            document.body.append(js)
+            Cloud.init = true
+        }
+    },
+
+    upload: (ID, ori, mode = "GM") => {
+        A = new Article(ID, ori, mode)
+        A.load().then(() => { Cloud.createUploadSession(A) })
+    },
+
+    createUploadSession: (Article) => {
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: `https://api.phantom-sea-limited.ltd/release/Cloud/upload?gtoken=${Cloud.gtoken}&id=${Article.ID}&source=${Article.ori}`,
+            headers: {
+                "Accept": "text/html"
+            },
+            onload: function (response) {
+                window.notice.push(response.responseText, Notice.DEBUG)
+                if (response.status == 200) {
+                    r = JSON.parse(response.responseText)
+                    Cloud.uploadChunks(r.uploadUrl, Article, Cloud.chunkSize)
+                }
+            }
+        });
+    },
+
+    // 将文件切片成指定大小的块
+    sliceFile: (file, chunkSize) => {
+        const slices = [];
+        let start = 0;
+        while (start < file.size) {
+            slices.push(file.slice(start, start + chunkSize));
+            start += chunkSize;
+        }
+        return slices;
+    },
+
+    // 开始上传切片
+    uploadChunks: (uploadSessionUrl, Article, chunkSize) => {
+        var file = Cloud.file(Article)
+        const slices = Cloud.sliceFile(file, chunkSize);
+        let index = 0;
+
+        function uploadNextChunk() {
+            if (index >= slices.length) {
+                window.notice.push('文件上传完成,感谢您的慷慨', Notice.INFO);
+                return;
+            }
+
+            const currentChunk = slices[index];
+            const chunkStart = index * chunkSize;
+            const chunkEnd = chunkStart + currentChunk.size - 1;
+
+            const headers = {
+                'Content-Range': `bytes ${chunkStart}-${chunkEnd}/${file.size}`,
+                'Content-Length': currentChunk.size,
+            };
+
+            fetch(uploadSessionUrl, {
+                method: 'PUT',
+                headers,
+                body: currentChunk,
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        window.notice.push(`Chunk upload failed: ${response.status} ${response.statusText}`, Notice.ERROR);
+                        throw new Error(`Chunk upload failed: ${response.status} ${response.statusText}`);
+                    }
+                    window.notice.push(`Uploaded chunk ${index + 1}/${slices.length}`, Notice.DEBUG);
+                    index++;
+                    uploadNextChunk();
+                })
+                .catch(error => {
+                    window.notice.push(`Chunk upload failed: ${error}`, Notice.ERROR);
+                });
+        }
+        uploadNextChunk();
+    }
+}
+window.Cloud = Cloud
 
 // INIT
 setTimeout(check)
@@ -557,16 +679,18 @@ function run() {
     setTimeout(search_helper)
     setTimeout(search_first)
     setTimeout(details_helper)
+    if (IDs) { setTimeout(Cloud.recaptcha_init) }
 }
 
 //insert JS into Page
+function install(func) {
+    var s = document.createElement("script")
+    s.type = "text/javascript"
+    s.innerHTML = func.toString()
+    document.body.append(s)
+}
+
 function insert() {
-    function install(func) {
-        var s = document.createElement("script")
-        s.type = "text/javascript"
-        s.innerHTML = func.toString()
-        document.body.append(s)
-    }
     // function EX(a, b, c, d = null) {
     //     window.STV = {}
     //     window.STV.Article = a
@@ -691,6 +815,20 @@ function add_button() {
             })
             window.notice.push("注入已执行!", Notice.WARNING)
         }))
+        main.append(create("前往云端(临时)", "fa fa-cloud", function () {
+            // if (Cloud.gtoken) { unsafeWindow.grecaptcha.reset() }
+            // unsafeWindow.grecaptcha.execute()
+            var url = "https://api.phantom-sea-limited.ltd/release/API/get?id=01T4VX664MN4UKD43BSZC3YZOSFZTLPHDC"
+            window.open('javascript:window.name;', '<script>location.replace("' + url + '")<\/script>');
+        }))
+        main.append(create("上传至云端", "fa fa-cloud-upload", function () {
+            if (Cloud.gtoken) { unsafeWindow.grecaptcha.reset() }
+            unsafeWindow.grecaptcha.execute()
+            Task.add(`Cloud.upload(${IDs.id}, "${IDs.host}")`)
+        }))
+        main.append(create("下载云端最新文件", "fa fa-cloud-download", function () {
+            window.notice.push("尚未完工", Notice.ERROR)
+        }))
         // main.append(create("测试", "fa fa-certificate", async function () {
         //     const asyncKeys = await GM.listValues();
         //     asyncKeys.forEach(key => {
@@ -741,7 +879,7 @@ async function search_helper() {
 }
 
 function search_first() {
-    if (document.location.pathname === "/" || document.location.pathname === "/search/" ) {
+    if (document.location.pathname === "/" || document.location.pathname === "/search/") {
         setTimeout(search_helper_handler, 2000)
     }
 }
@@ -767,7 +905,7 @@ const search = {
                 onload: function (response) {
                     if (response.status == 200) {
                         var n = response.responseText.match(/<span class="book-name">(.*)<\/span>/)[1]
-                        console.log(n)
+                        window.notice.push(n, Notice.DEBUG);
                         dom.innerText = n
                         search.data.ciweimao[ID] = n
                         Article.GM_config("Helper", search.data)
@@ -794,7 +932,7 @@ const search = {
                         search.data.sfacg[ID] = r.tickets.NovelName
                         Article.GM_config("Helper", search.data)
                     }
-                    console.log(r);
+                    window.notice.push(r, Notice.DEBUG);
                 }
             });
         } else {
@@ -812,7 +950,7 @@ const search = {
                 onload: function (response) {
                     if (response.status == 200) {
                         var n = response.responseText.match(/<meta property="og:title" content="(.*)" \/>/)[1]
-                        console.log(n)
+                        window.notice.push(n, Notice.DEBUG);
                         dom.innerText = n
                         search.data.linovel[ID] = n
                         Article.GM_config("Helper", search.data)
@@ -837,7 +975,7 @@ const search = {
                         var x = new Uint8Array(response.response);
                         var str = new TextDecoder('gbk').decode(x)
                         var n = str.match(/<b>《(.*)》/)[1]
-                        console.log(n)
+                        window.notice.push(n, Notice.DEBUG);
                         dom.innerText = n
                         search.data.wenku8[ID] = n
                         Article.GM_config("Helper", search.data)
