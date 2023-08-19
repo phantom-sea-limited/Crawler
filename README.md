@@ -5,9 +5,10 @@
 1. [sangtacviet](#sangtacviet)
 2. [nhimmeocf-刺猬猫分享](#nhimmeocf-刺猬猫分享)
 3. [轻之国度](#轻之国度)
-4. [同人小说通用](#同人小说通用)
-5. [imwcr](#imwcr)
-6. [已失效内容](#已失效内容)
+4. [(正版漫画)heros-web.com](#heros-web.com)
+5. [同人小说通用](#同人小说通用)
+6. [imwcr](#imwcr)
+7. [已失效内容](#已失效内容)
 
 # **sangtacviet**
 
@@ -123,6 +124,28 @@
 3. 执行`python lightnovel.us.py ****.json`打包epub，过程中会下载一些网络图片，请静候
 
 4. 在`.tmp`目录下找到成品
+
+# **heros-web.com**
+
+### 相关文件
+
+> heros-web.com.user.js
+
+**使用说明**
+
+请使用[Tampermonkey](https://www.tampermonkey.net/)安装此用户脚本
+
+[**点击安装脚本**](https://github.com/phantom-sea-limited/Crawler/raw/main/heros-web.com.user.js)
+
+[**点击安装脚本(镜像)**](https://static.deception.world/https://github.com/phantom-sea-limited/Crawler/raw/main/heros-web.com.user.js)
+
+![image](https://github.com/phantom-sea-limited/Crawler/assets/46920034/0b4b04ca-eafb-4349-b0a6-2e2c192c18b8)
+
+和以往不一样，功能入口在Tampermonkey中，如上图所示
+
+![image](https://github.com/phantom-sea-limited/Crawler/assets/46920034/97578a30-fe50-4572-98f6-e85cf16db5fc)
+
+温馨提示：请提前给与网页下载多项文件的权限
 
 # **同人小说(通用)**
 
