@@ -1,16 +1,17 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      1.6
+// @version      1.7
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
 // @require      https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.11.1.min.js
 // @require      https://static.deception.world/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
-// @require      https://static.deception.world/https://fezvrasta.github.io/snackbarjs/dist/snackbar.min.js
+// @require      https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.js?v=1.4
 // @icon         https://api.phantom-sea-limited.ltd/favicon.ico
 // @grant        GM_log
 // @grant        unsafeWindow
+// @run-at       document-body
 // @license      MIT
 // ==/UserScript==
 
@@ -297,7 +298,8 @@ class Notice {
     static snackbar = "S"
     c_tr = { 0: "debug", 10: "info", 20: "warn", 30: "error", 40: "error" }
     g_tr = { 0: "[DEBUG]", 10: "[INFO]", 20: "[WARN]", 30: "[ERROR]", 40: "[Critical]" }
-    s_tr = { 0: "grey", 10: "blue", 20: "warn", 30: "error", 40: "error" }
+    // s_tr = { 0: "grey", 10: "blue", 20: "warn", 30: "error", 40: "error" }
+    s_tr = { 0: "info", 10: "green", 20: "warning", 30: "danger", 40: "danger" }
 
     constructor(loglevel = Notice.INFO, method = [Notice.GM_log, Notice.console, Notice.snackbar]) {
         this.loglevel = loglevel
@@ -321,14 +323,20 @@ class Notice {
     }
 
     S(msg, level) {
-        $.snackbar({
-            content: msg, // text of the snackbar
-            style: `toast ${this.s_tr[level]}`, // add a custom class to your snackbar
-            timeout: 1000 // time in milliseconds after the snackbar autohides, 0 is disabled
+        // $.snackbar({
+        //     content: msg, // text of the snackbar
+        //     style: `toast ${this.s_tr[level]}`, // add a custom class to your snackbar
+        //     timeout: 1000 // time in milliseconds after the snackbar autohides, 0 is disabled
+        // })
+        window.SnackBar({
+            message: msg,
+            status: this.s_tr[level],
+            fixed: true
         })
     }
 }
-window.notice = new Notice(Notice.DEBUG, [Notice.console, Notice.snackbar])
+window.notice = new Notice(Notice.INFO, [Notice.console, Notice.snackbar])
+window.SnackBar = SnackBar
 
 //INIT
 setTimeout(install)
@@ -351,26 +359,30 @@ function check() {
 }
 
 function install() {
-    var css = document.createElement("link")
-    css.rel = 'stylesheet'
-    css.href = "https://static.deception.world/https://fezvrasta.github.io/snackbarjs/dist/snackbar.min.css"
-    document.body.append(css)
-    css = document.createElement("style")
-    css.innerHTML = `
-    .blue {
-    background-color: #479ad0;
+    if (document.body != undefined) {
+        var css = document.createElement("link")
+        css.rel = 'stylesheet'
+        css.href = "https://static.deception.world/https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.css?v=1.4"
+        document.body.append(css)
+        css = document.createElement("style")
+        css.innerHTML = `
+        .blue {
+        background-color: #479ad0;
+        }
+        .grey {
+            background-color: #878787;
+        }
+        .warn {
+            background-color: #7350af;
+        }
+        .error {
+            background-color: #d50a0a;
+        }
+        `
+        document.body.append(css)
+    } else {
+        setTimeout(install)
     }
-    .grey {
-        background-color: #878787;
-    }
-    .warn {
-        background-color: #7350af;
-    }
-    .error {
-        background-color: #d50a0a;
-    }
-    `
-    document.body.append(css)
 }
 
 window.Article = Article

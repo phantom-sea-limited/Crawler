@@ -5,7 +5,7 @@
 1. [sangtacviet](#sangtacviet)
 2. [nhimmeocf-刺猬猫分享](#nhimmeocf-刺猬猫分享)
 3. [轻之国度](#轻之国度)
-4. [(正版漫画)heros-web.com](#heros-web.com)
+4. [(正版漫画)heros-web.com](#heros-webcom)
 5. [同人小说通用](#同人小说通用)
 6. [imwcr](#imwcr)
 7. [已失效内容](#已失效内容)

@@ -5,7 +5,7 @@
 // @description  下载章节
 // @author       Rcrwrate
 // @match        https://viewer.heros-web.com/episode/*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=heros-web.com
+// @icon         https://api.phantom-sea-limited.ltd/favicon.ico
 // @grant        unsafeWindow
 // @grant        GM_registerMenuCommand
 // ==/UserScript==
