@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      1.7
+// @version      1.8
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
@@ -102,7 +102,16 @@ class Article {
     async fetchCatalog() {
         await this.load()
         if (document.location.href == `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/`) {
-            var log = localStorage.getItem("LOG")
+            window.Task_STOP = true
+            var r = await fetch(`https://sangtacviet.vip/index.php?ngmar=chapterlist&h=${this.ori}&bookid=${this.ID}&sajax=getchapterlist&force=true`)
+            r = await r.json()
+            window.Task_STOP = false
+            var log
+            if (r.enckey) {
+                log = localStorage.getItem("LOG")
+            } else {
+                log = r.data
+            }
             if (log == null) {
                 insert()
                 window.Task_STOP = true

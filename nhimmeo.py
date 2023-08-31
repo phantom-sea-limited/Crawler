@@ -8,7 +8,12 @@ def find_src(k):
     try:
         return re.findall(r'''<img src="([\s\S]+?)" ''', k)[0]
     except:
-        print(f"[WARNING]:\t failed using Default regular expression \t {k}")
+        pass
+    try:
+        return re.findall(r'''<img loading="lazy" src="([\s\S]+?)" ''', k)[0]
+    except:
+        pass
+        # print(f"[WARNING]:\t failed using Default regular expression \t {k}")
     try:
         return re.findall(r'''<img alt="([\s\S]+?)" src="([\s\S]+?)"''', k)[0][1]
     except:
