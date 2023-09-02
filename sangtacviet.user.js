@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      1.8
+// @version      2.0
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
@@ -25,6 +25,8 @@
 // @connect      www.linovel.net
 // @connect      www.wenku8.net
 // @connect      api.phantom-sea-limited.ltd
+// @connect      speed.phantom-sea-limited.ltd
+// @connect      dl.deception.world
 // @license      MIT
 // ==/UserScript==
 
@@ -167,18 +169,23 @@ class Article {
                 var h2 = main.getElementsByTagName("h2")
                 var ul = main.getElementsByTagName("ul")
                 var i = 0
-                Article.chapterList = Article.chapterList.slice(0, 1)
+                // Article.chapterList = Article.chapterList.slice(0, 1)
                 while (i < h2.length) {
-                    var chap = { "name": h2[i].innerText, "lists": {} }
+                    if (Article.chapterList[i + 1] == undefined) {
+                        Article.chapterList[i + 1] = { "name": h2[i].innerText, "lists": {} }
+                    }
+                    // var chap = { "name": h2[i].innerText, "lists": {} }
                     var j = 0
                     while (j < ul[i].children.length) {
                         var ID = ul[i].children[j].children[0].href.replace("https://wap.ciweimao.com/chapter/", "")
-                        chap.lists[ID] = Article.chapterList[0][ID]
-                        chap.lists[ID]["name"] = ul[i].children[j].innerText
+                        if (Article.chapterList[i + 1].lists[ID] == undefined) {
+                            Article.chapterList[i + 1].lists[ID] = Article.chapterList[0][ID]
+                            Article.chapterList[i + 1].lists[ID]["name"] = ul[i].children[j].innerText
+                        }
                         j++
                     }
                     i++
-                    Article.chapterList.push(chap)
+                    // Article.chapterList.push(chap)
                 }
             } else {
                 await Task.add(Task.createBymethod(Article.ID, Article.ori, "translateCatalog", Article.mode), "push")
@@ -190,19 +197,26 @@ class Article {
             if (document.location.href == `https://zh.nhimmeo.cf/book/${Article.ID}/catalog/`) {
                 var all = document.getElementsByClassName("collapsible")
                 var i = 0
-                Article.chapterList = Article.chapterList.slice(0, 1)
+                // Article.chapterList = Article.chapterList.slice(0, 1)
                 while (i < all.length) {
-                    var catalog = { "name": all[i].innerText.split("\n")[1], "lists": {} }
+                    if (Article.chapterList[i + 1] == undefined) {
+                        Article.chapterList[i + 1] = { "name": all[i].innerText.split("\n")[1], "lists": {} }
+                    }
+                    // var catalog = { "name": all[i].innerText.split("\n")[1], "lists": {} }
                     var chaplist = all[i].nextElementSibling.getElementsByClassName("chapter_info")
                     var j = 0
                     while (j < chaplist.length) {
                         var downloadstate = false
                         var ID = chaplist[j].nextElementSibling.nextElementSibling.childNodes[0].href.split('/').pop()
-                        catalog.lists[ID] = Article.chapterList[0][ID]
-                        catalog.lists[ID]['name'] = chaplist[j].nextElementSibling.nextElementSibling.innerText
+                        if (Article.chapterList[i + 1].lists[ID] == undefined) {
+                            Article.chapterList[i + 1].lists[ID] = Article.chapterList[0][ID]
+                            Article.chapterList[i + 1].lists[ID]["name"] = chaplist[j].nextElementSibling.nextElementSibling.innerText
+                        }
+                        // catalog.lists[ID] = Article.chapterList[0][ID]
+                        // catalog.lists[ID]['name'] = chaplist[j].nextElementSibling.nextElementSibling.innerText
                         j += 1
                     }
-                    Article.chapterList.push(catalog)
+                    // Article.chapterList.push(catalog)
                     i += 1
                 }
             } else {
@@ -301,7 +315,7 @@ class Article {
             this.chapterList.slice(1).forEach(chap => {
                 for (let k in chap.lists) {
                     var chapinfo = chap.lists[k]
-                    if (chapinfo['CanDownload'] != false && (chapinfo["content"] == "" || chapinfo["content"].contain("function()"))) {
+                    if (chapinfo['CanDownload'] != false && (chapinfo["content"] == "" || chapinfo["content"].includes("function()"))) {
                         tasklists.unshift(Task.create(this.ID, this.ori, [`await A.fetchChapter(${i},${k})`], this.mode))
                     }
                 }
@@ -546,7 +560,7 @@ const Cloud = {
     recaptcha_init: () => {
         if (!Cloud.init) {
             function recaptcha_callback(e) {
-                STV.notice.push("人机验证成功!", STV.Notice.INFO)
+                STV.notice.push("人机验证成功!正在上传文件", STV.Notice.INFO)
                 STV.Cloud.gtoken = e
                 STV.Task_STOP = false
                 STV.Task.init()
@@ -575,13 +589,46 @@ const Cloud = {
             method: "GET",
             url: `https://api.phantom-sea-limited.ltd/release/Cloud/upload?gtoken=${Cloud.gtoken}&id=${Article.ID}&source=${Article.ori}`,
             headers: {
-                "Accept": "text/html"
+                "Accept": "text/json"
             },
             onload: function (response) {
                 window.notice.push(response.responseText, Notice.DEBUG)
                 if (response.status == 200) {
                     r = JSON.parse(response.responseText)
                     Cloud.uploadChunks(r.uploadUrl, Article, Cloud.chunkSize)
+                }
+            }
+        });
+    },
+
+    fetchlatest: (ID, ori) => {
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: `https://api.phantom-sea-limited.ltd/release/Cloud/v1/Sangtacviet/download?id=${ID}&source=${ori}`,
+            headers: {
+                "Accept": "text/json"
+            },
+            onload: function (response) {
+                window.notice.push(response.responseText, Notice.DEBUG)
+                if (response.status == 200) {
+                    r = JSON.parse(response.responseText)
+                    if (r['@microsoft.graph.downloadUrl']) {
+                        window.notice.push("已找到到云端数据,正在下载", Notice.INFO)
+                        GM_xmlhttpRequest({
+                            method: "GET",
+                            url: r['@microsoft.graph.downloadUrl'],
+                            onload: function (response) {
+                                if (response.status == 200) {
+                                    GM.setValue(ID, response.response)
+                                    window.notice.push("下载成功，已自动导入", Notice.INFO)
+                                } else {
+                                    window.notice.push("下载失败，请稍后重试", Notice.INFO)
+                                }
+                            }
+                        });
+                    } else {
+                        window.notice.push("未找到云端数据", Notice.ERROR)
+                    }
                 }
             }
         });
@@ -794,7 +841,7 @@ function add_button() {
         main.innerHTML = ""
         main.append(create("下载", "fa fa-download", function () {
             var A = new Article(IDs.id, IDs.host, "GM")
-            A.load().then(res => { A.reinit() })
+            A.load().then(res => { A.reinit().then(() => { Task.init() }) })
         }))
         main.append(create("修复下载", "fa fa-download", function () {
             var A = new Article(IDs.id, IDs.host, "GM")
@@ -836,7 +883,8 @@ function add_button() {
             Task.add(`Cloud.upload(${IDs.id}, "${IDs.host}")`)
         }))
         main.append(create("下载云端最新文件", "fa fa-cloud-download", function () {
-            window.notice.push("尚未完工", Notice.ERROR)
+            // window.notice.push("尚未完工", Notice.ERROR)
+            Cloud.fetchlatest(IDs.id, IDs.host)
         }))
         // main.append(create("测试", "fa fa-certificate", async function () {
         //     const asyncKeys = await GM.listValues();

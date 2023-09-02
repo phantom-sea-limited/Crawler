@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      1.8
+// @version      2.0
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -11,7 +11,11 @@
 // @icon         https://api.phantom-sea-limited.ltd/favicon.ico
 // @grant        GM_log
 // @grant        unsafeWindow
+// @grant        GM_xmlhttpRequest
 // @grant        GM_registerMenuCommand
+// @connect      api.phantom-sea-limited.ltd
+// @connect      speed.phantom-sea-limited.ltd
+// @connect      dl.deception.world
 // @run-at       document-body
 // @license      MIT
 // ==/UserScript==
@@ -41,6 +45,7 @@ class Article {
                 Task.createBymethod(this.ID, "fetchCatalog", this.mode),
                 Task.createBymethod(this.ID, "PrefetchChapter", this.mode),
                 Task.createBymethod(this.ID, "file", this.mode),
+                `Cloud.UploadTask(${this.ID},  "${this.mode}")`
             ]
         )
         await this.save()
@@ -56,6 +61,7 @@ class Article {
                     Task.createBymethod(this.ID, "fetchCatalog", this.mode),
                     Task.createBymethod(this.ID, "PrefetchChapter", this.mode),
                     Task.createBymethod(this.ID, "file", this.mode),
+                    `Cloud.UploadTask(${this.ID}, "${this.mode}")`
                 ]
             )
             setTimeout(Task.init, 200)
@@ -357,11 +363,165 @@ class Notice {
         })
     }
 }
+window.Notice = Notice
 window.notice = new Notice(Notice.INFO, [Notice.console, Notice.snackbar])
 window.SnackBar = SnackBar
 
+const Cloud = {
+    chunkSize: 5 * 1024 * 1024,    // 5MB 切片大小，根据需要进行调整
+    init: false,
+    gtoken: undefined,
+    uploadSessionUrl: undefined,
+
+    file: (Article) => {
+        const jsonString = JSON.stringify(Article.output());
+        return new Blob([jsonString], { type: 'application/json' });
+    },
+
+    UploadTask: (ID, ori, mode) => {
+        install(function recaptcha_init_Callback() { grecaptcha.execute() })
+        Task.add(`Cloud.upload(${ID}, "${ori}", "${mode}")`)
+        Cloud.recaptcha_init()
+        window.Task_STOP = true
+        window.notice.push("正在将结果上传至云端,用于分享给其他用户,感谢您的慷慨", Notice.INFO)
+    },
+
+    recaptcha_init: () => {
+        if (!Cloud.init) {
+            function recaptcha_callback(e) {
+                nhimmeo.notice.push("人机验证成功!正在上传文件", nhimmeo.Notice.INFO)
+                nhimmeo.Cloud.gtoken = e
+                nhimmeo.Task_STOP = false
+                nhimmeo.Task.init()
+            }
+            var key = document.createElement("div")
+            key.dataset["sitekey"] = "6LdwBqEnAAAAAFW5q1vRrjxoy2igf4h0knhkChSI"
+            key.dataset["size"] = "invisible"
+            key.dataset['callback'] = "recaptcha_callback"
+            key.classList.add("g-recaptcha")
+            document.body.append(key)
+            install(recaptcha_callback)
+            var js = document.createElement('script')
+            js.src = "https://www.recaptcha.net/recaptcha/api.js?onload=recaptcha_init_Callback"
+            document.body.append(js)
+            Cloud.init = true
+        }
+    },
+
+    upload: (ID, mode = "GM") => {
+        A = new Article(ID, mode)
+        A.load().then(() => { Cloud.createUploadSession(A) })
+    },
+
+    createUploadSession: (Article) => {
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: `https://api.phantom-sea-limited.ltd/release/Cloud/v1/nhimmeo/upload?gtoken=${Cloud.gtoken}&id=${Article.ID}`,
+            headers: {
+                "Accept": "text/json"
+            },
+            onload: function (response) {
+                window.notice.push(response.responseText, Notice.DEBUG)
+                if (response.status == 200) {
+                    r = JSON.parse(response.responseText)
+                    Cloud.uploadChunks(r.uploadUrl, Article, Cloud.chunkSize)
+                }
+            }
+        });
+    },
+
+    fetchlatest: (ID) => {
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: `https://api.phantom-sea-limited.ltd/release/Cloud/v1/nhimmeo/download?id=${ID}`,
+            headers: {
+                "Accept": "text/json"
+            },
+            onload: function (response) {
+                window.notice.push(response.responseText, Notice.DEBUG)
+                if (response.status == 200) {
+                    r = JSON.parse(response.responseText)
+                    if (r['@microsoft.graph.downloadUrl']) {
+                        window.notice.push("已找到到云端数据,正在下载", Notice.INFO)
+                        GM_xmlhttpRequest({
+                            method: "GET",
+                            url: r['@microsoft.graph.downloadUrl'],
+                            onload: function (response) {
+                                if (response.status == 200) {
+                                    window.localforage.setItem(ID, response.response)
+                                    window.notice.push("下载成功，已自动导入", Notice.INFO)
+                                } else {
+                                    window.notice.push("下载失败，请稍后重试", Notice.INFO)
+                                }
+                            }
+                        });
+                    } else {
+                        window.notice.push("未找到云端数据", Notice.ERROR)
+                    }
+                }
+            }
+        });
+    },
+
+    // 将文件切片成指定大小的块
+    sliceFile: (file, chunkSize) => {
+        const slices = [];
+        let start = 0;
+        while (start < file.size) {
+            slices.push(file.slice(start, start + chunkSize));
+            start += chunkSize;
+        }
+        return slices;
+    },
+
+    // 开始上传切片
+    uploadChunks: (uploadSessionUrl, Article, chunkSize) => {
+        var file = Cloud.file(Article)
+        const slices = Cloud.sliceFile(file, chunkSize);
+        let index = 0;
+
+        function uploadNextChunk() {
+            if (index >= slices.length) {
+                window.notice.push('文件上传完成,感谢您的慷慨', Notice.INFO);
+                return;
+            }
+
+            const currentChunk = slices[index];
+            const chunkStart = index * chunkSize;
+            const chunkEnd = chunkStart + currentChunk.size - 1;
+
+            const headers = {
+                'Content-Range': `bytes ${chunkStart}-${chunkEnd}/${file.size}`,
+                'Content-Length': currentChunk.size,
+            };
+
+            fetch(uploadSessionUrl, {
+                method: 'PUT',
+                headers,
+                body: currentChunk,
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        window.notice.push(`Chunk upload failed: ${response.status} ${response.statusText}`, Notice.ERROR);
+                        throw new Error(`Chunk upload failed: ${response.status} ${response.statusText}`);
+                    }
+                    window.notice.push(`Uploaded chunk ${index + 1}/${slices.length}`, Notice.DEBUG);
+                    index++;
+                    uploadNextChunk();
+                })
+                .catch(error => {
+                    window.notice.push(`Chunk upload failed: ${error}`, Notice.ERROR);
+                });
+        }
+        uploadNextChunk();
+    }
+}
+window.Cloud = Cloud
+
+
+
 //INIT
-setTimeout(install)
+setTimeout(installCSS)
 setTimeout(check)
 setTimeout(() => { if (document.readyState != "complete") { document.location.href = document.location.href } }, 15000)
 function check() {
@@ -380,7 +540,15 @@ function check() {
     }
 }
 
-function install() {
+//insert JS into Page
+function install(func) {
+    var s = document.createElement("script")
+    s.type = "text/javascript"
+    s.innerHTML = func.toString()
+    document.body.append(s)
+}
+
+function installCSS() {
     if (document.body != undefined) {
         var css = document.createElement("link")
         css.rel = 'stylesheet'
@@ -403,7 +571,7 @@ function install() {
         `
         document.body.append(css)
     } else {
-        setTimeout(install)
+        setTimeout(installCSS)
     }
 }
 
@@ -456,15 +624,19 @@ function add_button() {
         return button
     }
     if (IDs != null) {
+        setTimeout(Cloud.recaptcha_init, 1000)
         IDs = IDs[1]
         var main = $(".box-colored")[0]
-        main.append(create("下载(高速)", "fa-download", function () {
-            var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
-            IDs = IDs[1]
-            var A = new Article(IDs)
-            A.load().then(res => { A.reinit() })
+        // main.append(create("下载(高速)", "fa-download", function () {
+        //     var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
+        //     IDs = IDs[1]
+        //     var A = new Article(IDs)
+        //     A.load().then(res => { A.reinit() })
+        // }))
+        main.append(create("前往云端(临时)", "fa-cloud", function () {
+            var url = "https://api.phantom-sea-limited.ltd/release/API/get?id=01T4VX663CLVLERUB5MJGI5DO4YJWOZSTP"
+            window.open('javascript:window.name;', '<script>location.replace("' + url + '")<\/script>');
         }))
-        // main.append(document.createElement("br"))
         main.append(create("下载(稳定)", "fa-download", function () {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]
@@ -472,13 +644,17 @@ function add_button() {
             A.load().then(res => { A.reinit() })
         }))
         main.append(document.createElement("br"))
-        main.append(create("修复下载(高速)", "fa-download", function () {
-            var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
-            IDs = IDs[1]
-            var A = new Article(IDs)
-            A.PrefetchChapter().then(res => { Task.init() })
+        // main.append(create("修复下载(高速)", "fa-download", function () {
+        //     var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
+        //     IDs = IDs[1]
+        //     var A = new Article(IDs)
+        //     A.PrefetchChapter().then(res => { Task.init() })
+        // }))
+        main.append(create("上传至云端", "fa-cloud-upload", function () {
+            if (Cloud.gtoken) { unsafeWindow.grecaptcha.reset() }
+            unsafeWindow.grecaptcha.execute()
+            Task.add(`Cloud.upload(${IDs})`)
         }))
-        // main.append(document.createElement("br"))
         main.append(create("修复下载(稳定)", "fa-download", function () {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]
@@ -486,13 +662,17 @@ function add_button() {
             A.PrefetchChapter().then(res => { Task.init() })
         }))
         main.append(document.createElement("br"))
-        main.append(create("手动导出(高速)", "fa-floppy-o", function () {
-            var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
-            IDs = IDs[1]
-            var A = new Article(IDs)
-            A.file()
-        }))
+        // main.append(create("手动导出(高速)", "fa-floppy-o", function () {
+        //     var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
+        //     IDs = IDs[1]
+        //     var A = new Article(IDs)
+        //     A.file()
+        // }))
         // main.append(document.createElement("br"))
+        main.append(create("下载云端最新文件", "fa-cloud-download", function () {
+            // window.notice.push("尚未完工", Notice.ERROR)
+            Cloud.fetchlatest(IDs)
+        }))
         main.append(create("手动导出(稳定)", "fa-floppy-o", function () {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/)
             IDs = IDs[1]

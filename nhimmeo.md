@@ -9,7 +9,7 @@
 **相关方法如下：**
 
 ```js
-A = new Article(ID)     // ID为书籍ID
+A = new Article(ID, mode)     // ID为书籍ID，mode是数据存储方式，默认留空为'normal'使用localStorge,其他任意值均使用localForage
 await A.load()          // 从缓存区间拉取数据(可以忽略此方法，在大部分情景下均会检查是否load)
 await A.fetchInfo()     // 获取书籍信息
 await A.fetchCatalog()  // 获取书籍目录(会清除所有缓存的章节内容!!!)

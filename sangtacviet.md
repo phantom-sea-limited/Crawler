@@ -57,6 +57,8 @@ await A.translateInfo()            // 翻译信息
 
 [**常规方法说明(nhimmeo)**](https://github.com/phantom-sea-limited/Crawler/blob/main/nhimmeo.md)
 
+<details>
+<summary>不重要的乱七八糟的东西</summary>
 
 ### 漏洞说明
 
@@ -104,3 +106,4 @@ async function _(){
 }
 eval (`_().then(res=>{console.log("unsleep")})`)
 ```
+</details>
