@@ -45,10 +45,11 @@ else:
     for i in raw["chapterList"]:
         Chaptername = i["name"]
         for j in i["lists"]:
-            content = j["content"].split("\n")
+            chap = i["lists"][j]
+            content = chap["content"].split("\n")
             text = [{
-                "Uid": j["href"].split("/")[-1],
-                "title": f'{Chaptername}-{j["name"]}',
+                "Uid": chap["href"].split("/")[-1],
+                "title": f'{Chaptername}-{chap["name"]}',
                 "lines": []
             }]
             for k in content:

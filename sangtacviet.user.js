@@ -18,6 +18,7 @@
 // @grant        GM_log
 // @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
+// @grant        GM_registerMenuCommand
 // @connect      book.sfacg.com
 // @connect      mip.ciweimao.com
 // @connect      wap.ciweimao.com
@@ -376,7 +377,6 @@ class Article {
         } else {
             await Article.GM_config(this.ID, this.output())
         }
-
     }
 
     static localconfig(key, msg = '') {
@@ -1025,3 +1025,8 @@ function details_helper() {
         title().innerText = unsafeWindow.bookinfo.name
     }
 }
+GM_registerMenuCommand("终止任务", () => {
+    window.Task_STOP = true
+    window.Task_info = []
+    Task.localconfig([])
+})

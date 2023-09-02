@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      1.7
+// @version      1.8
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -11,6 +11,7 @@
 // @icon         https://api.phantom-sea-limited.ltd/favicon.ico
 // @grant        GM_log
 // @grant        unsafeWindow
+// @grant        GM_registerMenuCommand
 // @run-at       document-body
 // @license      MIT
 // ==/UserScript==
@@ -80,12 +81,25 @@ class Article {
     async fetchCatalog() {
         await this.load()
         if (document.location.href == `https://zh.nhimmeo.cf/book/${this.ID}/catalog/`) {
+            try {
+                //true old,false ok;转换旧目录
+                if (this.chapterList[0].lists.length != undefined) {
+                    this.chapterList.forEach((chapList) => {
+                        var t = chapList.lists
+                        chapList.lists = {}
+                        t.forEach((chap) => {
+                            chapList.lists[chap.href.split('/')[4]] = { ...chap }
+                        })
+                    })
+                }
+            } catch { }
             var all = $(".collapsible")
             var i = 0
-            var oldchaperList = [...this.chapterList]
-            this.chapterList = []
             while (i < all.length) {
-                var catalog = { "name": all[i].innerText.split("\n")[1], "lists": [] }
+                if (this.chapterList[i] == undefined) {
+                    this.chapterList[i] = { "name": all[i].innerText.split("\n")[1], "lists": {} }
+                }
+                // var catalog = { "name": all[i].innerText.split("\n")[1], "lists": [] }
                 var chaplist = $(".chapter_info", all[i].nextElementSibling)
                 var j = 0
                 while (j < chaplist.length) {
@@ -94,17 +108,19 @@ class Article {
                     else if ($(".fa-battery-full", chaplist[j].children)[0] != undefined) { downloadstate = "userchap" }
                     else if ($(".fa-battery-half", chaplist[j].children)[0] != undefined) { downloadstate = "userchap" }
                     else if ($(".fa-battery-quarter", chaplist[j].children)[0] != undefined) { downloadstate = "userchap" }
-                    catalog.lists.push(
-                        {
-                            "name": chaplist[j].nextElementSibling.nextElementSibling.innerText,
-                            "href": chaplist[j].nextElementSibling.nextElementSibling.childNodes[0].href,
-                            "content": "",
-                            "CanDownload": downloadstate
-                        }
-                    )
+                    var href = chaplist[j].nextElementSibling.nextElementSibling.childNodes[0].href
+                    var chapid = href.split('/')[4]
+                    if (this.chapterList[i].lists[chapid] == undefined) {
+                        this.chapterList[i].lists[chapid] = { "content": "" }
+                    }
+                    this.chapterList[i].lists[chapid] = {
+                        "name": chaplist[j].nextElementSibling.nextElementSibling.innerText,
+                        "href": href,
+                        "CanDownload": downloadstate,
+                        ...this.chapterList[i].lists[chapid],
+                    }
                     j += 1
                 }
-                this.chapterList.push(catalog)
                 i += 1
             }
         } else {
@@ -133,13 +149,19 @@ class Article {
             var tasklists = []
             var i = 0
             this.chapterList.forEach(chap => {
-                var j = 0
-                chap.lists.forEach(chapinfo => {
+                // var j = 0
+                // chap.lists.forEach(chapinfo => {
+                //     if (chapinfo['CanDownload'] != false && chapinfo["content"] == "") {
+                //         tasklists.unshift(Task.create(this.ID, [`await A.fetchChapter(${i},${j})`], this.mode))
+                //     }
+                //     j++
+                // })
+                for (let k in chap.lists) {
+                    var chapinfo = chap.lists[k]
                     if (chapinfo['CanDownload'] != false && chapinfo["content"] == "") {
-                        tasklists.unshift(Task.create(this.ID, [`await A.fetchChapter(${i},${j})`], this.mode))
+                        tasklists.unshift(Task.create(this.ID, [`await A.fetchChapter(${i},${k})`], this.mode))
                     }
-                    j++
-                })
+                }
                 i++
             })
             if (tasklists.length != 0) {
@@ -499,4 +521,10 @@ function add_button() {
         setTimeout(add_task_status)
     }
 }
+
+GM_registerMenuCommand("终止任务", () => {
+    window.Task_STOP = true
+    window.Task_info = []
+    Task.localconfig([])
+})
 
