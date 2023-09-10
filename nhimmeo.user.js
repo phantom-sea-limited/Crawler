@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      2.0
+// @version      2.0.1
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -110,10 +110,13 @@ class Article {
                 var j = 0
                 while (j < chaplist.length) {
                     var downloadstate = false
-                    if ($(".fa-check-circle", chaplist[j].children)[0] != undefined) { downloadstate = "free" }
-                    else if ($(".fa-battery-full", chaplist[j].children)[0] != undefined) { downloadstate = "userchap" }
+                    //更新说明:
+                    //由于"该章节未审核通过"的存在,可能会存在free与userchap共存的情况,不过如此修改会导致性能消耗增加
+                    //example:https://zh.nhimmeo.cf/shchap/100348098
+                    if ($(".fa-battery-full", chaplist[j].children)[0] != undefined) { downloadstate = "userchap" }
                     else if ($(".fa-battery-half", chaplist[j].children)[0] != undefined) { downloadstate = "userchap" }
                     else if ($(".fa-battery-quarter", chaplist[j].children)[0] != undefined) { downloadstate = "userchap" }
+                    else if ($(".fa-check-circle", chaplist[j].children)[0] != undefined) { downloadstate = "free" }
                     var href = chaplist[j].nextElementSibling.nextElementSibling.childNodes[0].href
                     var chapid = href.split('/')[4]
                     if (this.chapterList[i].lists[chapid] == undefined) {
