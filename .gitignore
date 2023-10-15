@@ -17,3 +17,7 @@ node_modules/
 ts/*.js
 
 ts/dist
+
+!/ts/*.json
+
+/*.json

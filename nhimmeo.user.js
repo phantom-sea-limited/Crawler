@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      2.0.1
+// @version      2.1.0
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -421,7 +421,7 @@ const Cloud = {
             method: "GET",
             url: `https://api.phantom-sea-limited.ltd/release/Cloud/v2/nhimmeo/upload?gtoken=${Cloud.gtoken}&id=${Article.ID}`,
             headers: {
-                "Accept": "text/json"  
+                "Accept": "text/json"
             },
             onload: function (response) {
                 window.notice.push(response.responseText, Notice.DEBUG)
@@ -534,7 +534,13 @@ function check() {
             document.location.href = document.location.href
         }
         else if (document.body.innerText.includes("请勿往国内社区流传。感谢。")) {
-            run()
+            const c = new Date().getHours()
+            if (c > 23 || c < 12) {
+                run()
+            } else {
+                notice.push("当前时间段不允许爬虫,请给正常用户以访问空间", Notice.ERROR)
+                notice.push("请在12点前或23点以后运行爬虫", Notice.ERROR)
+            }
         } else {
             setTimeout(check, 2000)
         }
