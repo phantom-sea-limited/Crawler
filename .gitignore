@@ -12,4 +12,8 @@ txt
 
 *.log
 
-*.json
+node_modules/
+
+ts/*.js
+
+ts/dist

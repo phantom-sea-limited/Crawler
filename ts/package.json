@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@types/jquery": "^3.5.22",
+    "localforage": "^1.10.0",
+    "typescript": "^5.2.2"
+  },
+  "types": "./global.d.ts"
+}

@@ -398,7 +398,7 @@ const Cloud = {
                 nhimmeo.Task.init()
             }
             var key = document.createElement("div")
-            key.dataset["sitekey"] = "6LdwBqEnAAAAAFW5q1vRrjxoy2igf4h0knhkChSI"
+            key.dataset["sitekey"] = "6LdGK5soAAAAAAa_7FBlxgILeaF-uJoUhhyNqjR5"
             key.dataset["size"] = "invisible"
             key.dataset['callback'] = "recaptcha_callback"
             key.classList.add("g-recaptcha")
@@ -419,9 +419,9 @@ const Cloud = {
     createUploadSession: (Article) => {
         GM_xmlhttpRequest({
             method: "GET",
-            url: `https://api.phantom-sea-limited.ltd/release/Cloud/v1/nhimmeo/upload?gtoken=${Cloud.gtoken}&id=${Article.ID}`,
+            url: `https://api.phantom-sea-limited.ltd/release/Cloud/v2/nhimmeo/upload?gtoken=${Cloud.gtoken}&id=${Article.ID}`,
             headers: {
-                "Accept": "text/json"
+                "Accept": "text/json"  
             },
             onload: function (response) {
                 window.notice.push(response.responseText, Notice.DEBUG)
@@ -454,7 +454,7 @@ const Cloud = {
                                     window.localforage.setItem(ID, response.response)
                                     window.notice.push("下载成功，已自动导入", Notice.INFO)
                                 } else {
-                                    window.notice.push("下载失败，请稍后重试", Notice.INFO)
+                                    window.notice.push("下载失败，请稍后重试", Notice.ERROR)
                                 }
                             }
                         });
