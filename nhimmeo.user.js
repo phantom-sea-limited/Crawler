@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      2.1.0
+// @version      2.1.1
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
 // @require      https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.11.1.min.js
-// @require      https://static.deception.world/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
+// @require      https://static.sirin.top/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
 // @require      https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.js?v=1.4
 // @icon         https://api.phantom-sea-limited.ltd/favicon.ico
 // @grant        GM_log
@@ -15,8 +15,10 @@
 // @grant        GM_registerMenuCommand
 // @connect      api.phantom-sea-limited.ltd
 // @connect      speed.phantom-sea-limited.ltd
-// @connect      dl.deception.world
+// @connect      dl.sirin.top
 // @run-at       document-body
+// @updateURL    https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/nhimmeo.user.js
+// @downloadURL  https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/nhimmeo.user.js
 // @license      MIT
 // ==/UserScript==
 
@@ -561,7 +563,7 @@ function installCSS() {
     if (document.body != undefined) {
         var css = document.createElement("link")
         css.rel = 'stylesheet'
-        css.href = "https://static.deception.world/https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.css?v=1.4"
+        css.href = "https://static.sirin.top/https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.css?v=1.4"
         document.body.append(css)
         css = document.createElement("style")
         css.innerHTML = `

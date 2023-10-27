@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      2.0
+// @version      2.0.1
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
@@ -10,7 +10,7 @@
 // @match        https://m.sfacg.com/*
 // @icon         https://api.phantom-sea-limited.ltd/favicon.ico
 // @require      https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.js?v=1.4
-// @require      https://static.deception.world/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
+// @require      https://static.sirin.top/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_deleteValue
@@ -26,7 +26,9 @@
 // @connect      www.wenku8.net
 // @connect      api.phantom-sea-limited.ltd
 // @connect      speed.phantom-sea-limited.ltd
-// @connect      dl.deception.world
+// @connect      dl.sirin.top
+// @updateURL    https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/sangtacviet.user.js
+// @downloadURL  https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/sangtacviet.user.js
 // @license      MIT
 // ==/UserScript==
 
@@ -796,7 +798,7 @@ function insertCSS() {
     if (document.body != undefined) {
         var css = document.createElement("link")
         css.rel = 'stylesheet'
-        css.href = "https://static.deception.world/https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.css?v=1.4"
+        css.href = "https://static.sirin.top/https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.css?v=1.4"
         document.body.append(css)
         css = document.createElement("style")
         css.innerHTML = `
@@ -833,7 +835,7 @@ function add_button() {
     var main
     var css = document.createElement("link")
     css.rel = 'stylesheet'
-    css.href = "https://static.deception.world/https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    css.href = "https://static.sirin.top/https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     document.body.append(css)
 
     if (IDs != null) {

@@ -34,7 +34,7 @@ class Network():
         # "Px-Host": "",
         "Px-Token": "mysecuretoken",
     }
-    PROXY_DOMAIN = "no.deception.world"
+    PROXY_DOMAIN = "no.sirin.top"
 
     def __init__(self, hostTips: dict, log_path=".log", log_level=20, proxies={"http": None, "https": None}) -> None:
         '''

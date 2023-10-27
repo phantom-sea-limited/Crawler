@@ -96,7 +96,7 @@ class Epub():
                     print(f"[ERR]:\t{url}\t下载失败,是否重试[Y/n]使用代理下载[P]")
                     inputs = input('>')
                     if inputs == "P":
-                        url = "https://static.deception.world/" + url
+                        url = "https://static.sirin.top/" + url
                         continue
                     elif inputs != "n":
                         continue

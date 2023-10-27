@@ -24,7 +24,7 @@
 
 [**点击安装脚本**](https://github.com/phantom-sea-limited/Crawler/raw/main/sangtacviet.user.js)
 
-[**点击安装脚本(镜像)**](https://static.deception.world/https://github.com/phantom-sea-limited/Crawler/raw/main/sangtacviet.user.js)
+[**点击安装脚本(镜像)**](https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/sangtacviet.user.js)
 
 安装后，在ciweimao/sfacg/等等(未列出的来源未提供优化)书籍页面会出现一个黑色的下载框，点击就会自动操作，如果点击后没有反应，可以打开控制台康康有没有报错
 
@@ -75,7 +75,7 @@
 
 [**点击安装脚本**](https://github.com/phantom-sea-limited/Crawler/raw/main/nhimmeo.user.js)
 
-[**点击安装脚本(镜像)**](https://static.deception.world/https://github.com/phantom-sea-limited/Crawler/raw/main/nhimmeo.user.js)
+[**点击安装脚本(镜像)**](https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/nhimmeo.user.js)
 
 安装后，在书籍页面会出现一个黑色的下载框，点击就会自动操作，如果点击后没有反应，可以打开控制台康康有没有报错顺，带可以来仓库发一个issue，记得带上URL地址，以及相关信息
 
@@ -113,7 +113,7 @@
 
 [**点击安装脚本**](https://github.com/phantom-sea-limited/Crawler/raw/main/lightnovel.us.user.js)
 
-[**点击安装脚本(镜像)**](https://static.deception.world/https://github.com/phantom-sea-limited/Crawler/raw/main/lightnovel.us.user.js)
+[**点击安装脚本(镜像)**](https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/lightnovel.us.user.js)
 
 ![image](https://github.com/phantom-sea-limited/Crawler/assets/46920034/a89b82bd-039f-420d-81cd-397402780ef4)
 
@@ -137,7 +137,7 @@
 
 [**点击安装脚本**](https://github.com/phantom-sea-limited/Crawler/raw/main/heros-web.com.user.js)
 
-[**点击安装脚本(镜像)**](https://static.deception.world/https://github.com/phantom-sea-limited/Crawler/raw/main/heros-web.com.user.js)
+[**点击安装脚本(镜像)**](https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/heros-web.com.user.js)
 
 ![image](https://github.com/phantom-sea-limited/Crawler/assets/46920034/0b4b04ca-eafb-4349-b0a6-2e2c192c18b8)
 

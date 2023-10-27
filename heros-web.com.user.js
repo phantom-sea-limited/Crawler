@@ -8,6 +8,9 @@
 // @icon         https://api.phantom-sea-limited.ltd/favicon.ico
 // @grant        unsafeWindow
 // @grant        GM_registerMenuCommand
+// @updateURL    https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/heros-web.com.user.js
+// @downloadURL  https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/heros-web.com.user.js
+// @license      MIT
 // ==/UserScript==
 
 function o(e, t, i) {

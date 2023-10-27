@@ -187,7 +187,7 @@ function installCSS() {
     if (document.body != undefined) {
         var css = document.createElement("link")
         css.rel = 'stylesheet'
-        css.href = "https://static.deception.world/https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.css?v=1.4"
+        css.href = "https://static.sirin.top/https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.css?v=1.4"
         document.body.append(css)
         var css2 = document.createElement("style")
         css2.innerHTML = `

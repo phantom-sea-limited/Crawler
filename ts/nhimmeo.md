@@ -12,7 +12,7 @@
 // @grant        GM_registerMenuCommand
 // @connect      api.phantom-sea-limited.ltd
 // @connect      speed.phantom-sea-limited.ltd
-// @connect      dl.deception.world
+// @connect      dl.sirin.top
 // @run-at       document-body
 // @license      MIT
 // ==/UserScript==
