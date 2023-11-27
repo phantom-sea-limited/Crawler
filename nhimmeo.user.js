@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      2.1.1
+// @version      2.1.1.1
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -535,7 +535,7 @@ function check() {
         if (document.body.innerText.includes("Error code")) {
             document.location.href = document.location.href
         }
-        else if (document.body.innerText.includes("请勿往国内社区流传。感谢。")) {
+        else if (document.body.innerText.includes("设置")) {
             const c = new Date().getHours()
             if (c > 23 || c < 12) {
                 run()
