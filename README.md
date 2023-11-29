@@ -42,13 +42,12 @@
 
 **中文显示**
 
-在搜索界面支持ciweimao/sfacg/linovel/wenku8的中文显示
-[传送门](https://sangtacviet.vip/?find=&host=&minc=0&tag=)
-
 恢复被官方隐藏的中文，但是请**悄咪咪**的用，切忌宣传，如果你不想大家都没得用的话
 
 ![image](https://github.com/phantom-sea-limited/Crawler/assets/46920034/3af749c0-958e-4e0c-a6ca-50b4948d59ed)
 
+在搜索界面支持ciweimao/sfacg/linovel/wenku8的中文显示
+[传送门](https://sangtacviet.vip/?find=&host=&minc=0&tag=)
 
 **TIPS:当然，你也可以使用控制台使用:`STV.search_helper_handler()`**
 

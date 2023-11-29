@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      2.0.1
+// @version      2.1.0
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
