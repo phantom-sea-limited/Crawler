@@ -5,6 +5,7 @@
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
+// @match        https://sangtacviet.com/*
 // @match        https://zh.nhimmeo.cf/book/*
 // @match        https://wap.ciweimao.com/book/*
 // @match        https://m.sfacg.com/*
@@ -90,7 +91,7 @@ class Article {
 
     async fetchInfo() {
         await this.load()
-        if (document.location.href == `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/`) {
+        if (document.location.href == `${document.location.origin}/truyen/${this.ori}/1/${this.ID}/`) {
             this.details = ""
             this.author = bookinfo.author
             this.bookname = bookinfo.name
@@ -100,15 +101,15 @@ class Article {
         } else {
             await Task.add(Task.createBymethod(this.ID, this.ori, "fetchInfo", this.mode), "push")
             window.Task_STOP = true
-            document.location.href = `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/`
+            document.location.href = `${document.location.origin}/truyen/${this.ori}/1/${this.ID}/`
         }
     }
 
     async fetchCatalog() {
         await this.load()
-        if (document.location.href == `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/`) {
+        if (document.location.href == `${document.location.origin}/truyen/${this.ori}/1/${this.ID}/`) {
             window.Task_STOP = true
-            var r = await fetch(`https://sangtacviet.vip/index.php?ngmar=chapterlist&h=${this.ori}&bookid=${this.ID}&sajax=getchapterlist&force=true`)
+            var r = await fetch(`${document.location.origin}/index.php?ngmar=chapterlist&h=${this.ori}&bookid=${this.ID}&sajax=getchapterlist&force=true`)
             r = await r.json()
             window.Task_STOP = false
             var log
@@ -133,7 +134,7 @@ class Article {
                     if (chap.length == 3) {
                         chaplist[chap[1]] = {
                             "name": chap[2],
-                            "href": `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/${chap[1]}/`,
+                            "href": `${document.location.origin}/truyen/${this.ori}/1/${this.ID}/${chap[1]}/`,
                             "content": "",
                             "CanDownload": true
                         }
@@ -141,7 +142,7 @@ class Article {
                         if (chap[3] == "unvip") { var CanDownload = true } else { var CanDownload = false }
                         chaplist[chap[1]] = {
                             "name": chap[2],
-                            "href": `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/${chap[1]}/`,
+                            "href": `${document.location.origin}/truyen/${this.ori}/1/${this.ID}/${chap[1]}/`,
                             "content": "",
                             "CanDownload": CanDownload
                         }
@@ -154,7 +155,7 @@ class Article {
         } else {
             await Task.add(Task.createBymethod(this.ID, this.ori, "fetchCatalog", this.mode), "push")
             window.Task_STOP = true
-            document.location.href = `https://sangtacviet.vip/truyen/${this.ori}/1/${this.ID}/`
+            document.location.href = `${document.location.origin}/truyen/${this.ori}/1/${this.ID}/`
         }
     }
 
@@ -295,7 +296,12 @@ class Article {
         if (document.location.href == chap.href) {
             if (chapterfetcher.responseText != "" && content.innerHTML.contain("function()") == false) {
                 content.children[0].remove()
-                chap.content = content.innerHTML.replaceAll("<br>", "\n")
+                if (document.location.hostname == "sangtacviet.com") {
+                    FIX_CN()
+                    chap.content = content.innerHTML.replaceAll(" ", "").replaceAll("<br>", "\n").replace("由于版权问题，本源不支持查看原文。", "")
+                } else {
+                    chap.content = content.innerHTML.replaceAll("<br>", "\n")
+                }
             } else {
                 window.Task_STOP = true
                 await sleep(1000)
@@ -696,7 +702,7 @@ setTimeout(check)
 function check() {
     window.notice.push("Start checking!", Notice.DEBUG)
     try {
-        if (document.location.hostname == "sangtacviet.vip") {
+        if (document.location.hostname == "sangtacviet.vip" || document.location.hostname == "sangtacviet.com") {
             if (document.body.innerText.contain("检查站点连接是否安全")) {
                 setTimeout(check, 2000)
             } else if (document.body.innerText.includes("Error code")) {
@@ -907,6 +913,11 @@ function add_button() {
             Task.localconfig([])
             window.notice.push("任务已终止!", Notice.WARNING)
         }))
+        main.append(create("汉化工具", "fa fa-lightbulb-o", function () {
+            FIX_CN()
+            const content = document.getElementsByClassName("contentbox")[1]
+            content.innerHTML = content.innerHTML.replaceAll(" ", "").replace("由于版权问题，本源不支持查看原文。", "")
+        }))
     }
 }
 
@@ -1075,8 +1086,22 @@ function details_helper() {
         title().innerText = unsafeWindow.bookinfo.name
     }
 }
+
 GM_registerMenuCommand("终止任务", () => {
     window.Task_STOP = true
     window.Task_info = []
     Task.localconfig([])
 })
+
+function FIX_CN() {
+    if (document.location.hostname !== "sangtacviet.com") {
+        window.notice.push("你需要在sangtacviet.com下使用本功能", Notice.WARNING)
+        return
+    }
+    const all = Array.from(document.querySelectorAll("i")).slice(5)
+    for (const i of all) {
+        try {
+            i.replaceWith(i.cn)
+        } catch { }
+    }
+}

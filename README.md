@@ -32,7 +32,7 @@
 
 **已支持云端服务,将每一次用户的结果上传至云端,可以节约所有人的时间,希望各位保留这个功能.同时,所有文件均公开,可以通过上图所示按钮访问**
 
-1. 在sangtacviet.vip书籍详情页面，点击下载相关按钮
+1. 在sangtacviet.com书籍详情页面，点击下载相关按钮
 
 2. 在执行完之后，会产生一个包含所有信息的json文件，由于目前没做js的epub打包，可以先用python版本的
 
@@ -44,6 +44,11 @@
 
 在搜索界面支持ciweimao/sfacg/linovel/wenku8的中文显示
 [传送门](https://sangtacviet.vip/?find=&host=&minc=0&tag=)
+
+恢复被官方隐藏的中文，但是请**悄咪咪**的用，切忌宣传，如果你不想大家都没得用的话
+
+![image](https://github.com/phantom-sea-limited/Crawler/assets/46920034/3af749c0-958e-4e0c-a6ca-50b4948d59ed)
+
 
 **TIPS:当然，你也可以使用控制台使用:`STV.search_helper_handler()`**
 
