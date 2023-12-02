@@ -56,7 +56,8 @@ class Network():
         self.dfheader = Header.addheader(dfheader.copy(), self.PROXY_HEADER)
 
     def get(self, url, headers=False, noDefaultHeader=False, changeDefaultHeader=False, verify=False, **kwargs):
-        h = Header.headerchange(self, headers, noDefaultHeader, changeDefaultHeader)
+        h = Header.headerchange(
+            self, headers, noDefaultHeader, changeDefaultHeader)
         domain = url.split("/")[2]
         newurl = url.replace(domain, self.PROXY_DOMAIN)
         h["Px-Host"] = domain
@@ -80,7 +81,8 @@ class Network():
         return r
 
     def post(self, url, data=False, json={}, headers=False, noDefaultHeader=False, changeDefaultHeader=False, verify=False, **kwargs):
-        h = Header.headerchange(self, headers, noDefaultHeader, changeDefaultHeader)
+        h = Header.headerchange(
+            self, headers, noDefaultHeader, changeDefaultHeader)
         domain = url.split("/")[2]
         newurl = url.replace(domain, self.PROXY_DOMAIN)
         h["Px-Host"] = domain
@@ -110,7 +112,8 @@ class Network():
         return r
 
     def put(self, url, data=False, json={}, headers=False, noDefaultHeader=False, changeDefaultHeader=False, verify=False, **kwargs):
-        h = Header.headerchange(self, headers, noDefaultHeader, changeDefaultHeader)
+        h = Header.headerchange(
+            self, headers, noDefaultHeader, changeDefaultHeader)
         domain = url.split("/")[2]
         conf = get_qs(self.table, domain)
         if conf != False:
@@ -151,6 +154,7 @@ class Header():
                 h = Header.addheader(N.dfheader, header)
         else:
             h = N.dfheader.copy()
+        h = Header.addheader(h, N.PROXY_HEADER)
         if changeDefaultHeader:
             N.dfheader = h.copy()
         return h

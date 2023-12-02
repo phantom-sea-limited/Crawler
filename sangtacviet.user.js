@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      2.1.0
+// @version      2.1.1
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
@@ -299,6 +299,7 @@ class Article {
                 if (document.location.hostname == "sangtacviet.com") {
                     FIX_CN()
                     chap.content = content.innerHTML.replaceAll(" ", "").replaceAll("<br>", "\n").replace("由于版权问题，本源不支持查看原文。", "")
+                        .replaceAll(",", "，").replaceAll(".", "。").replaceAll("?", "？").replaceAll(":", "：").replaceAll("!", "！")
                 } else {
                     chap.content = content.innerHTML.replaceAll("<br>", "\n")
                 }
@@ -916,7 +917,9 @@ function add_button() {
         main.append(create("汉化工具", "fa fa-lightbulb-o", function () {
             FIX_CN()
             const content = document.getElementsByClassName("contentbox")[1]
+            content.children[0].remove()
             content.innerHTML = content.innerHTML.replaceAll(" ", "").replace("由于版权问题，本源不支持查看原文。", "")
+                .replaceAll(",", "，").replaceAll(".", "。").replaceAll("?", "？").replaceAll(":", "：").replaceAll("!", "！")
         }))
     }
 }
@@ -1098,10 +1101,12 @@ function FIX_CN() {
         window.notice.push("你需要在sangtacviet.com下使用本功能", Notice.WARNING)
         return
     }
-    const all = Array.from(document.querySelectorAll("i")).slice(5)
+    const all = Array.from(document.querySelectorAll("i"))
     for (const i of all) {
-        try {
-            i.replaceWith(i.cn)
-        } catch { }
+        if (i.className === "") {
+            try {
+                i.replaceWith(i.cn)
+            } catch { }
+        }
     }
 }
