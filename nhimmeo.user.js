@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      2.1.1.1
+// @version      2.2
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -22,6 +22,7 @@
 // @license      MIT
 // ==/UserScript==
 
+const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time))
 
 class Article {
     ID;
@@ -146,7 +147,13 @@ class Article {
         var chap = this.chapterList[i].lists[j]
         if (chap["CanDownload"] == "userchap") { chap.href = chap.href.replace("/chap/", "/shchap/") }
         if (document.location.href == chap.href) {
-            chap.content = $("article")[0].innerHTML.replaceAll("<br>", "")
+            const content = $("article")[0].innerHTML.replaceAll("<br>", "").replaceAll("\x04", "")
+            if (content.includes('↻ Loading.')) {
+                await sleep(1000)
+                return await this.fetchChapter(i, j)
+            } else {
+                chap.content = content
+            }
         } else {
             Task.add(Task.create(this.ID, [`await A.fetchChapter(${i},${j})`], this.mode), "push")
             window.Task_STOP = true
@@ -535,7 +542,7 @@ function check() {
         if (document.body.innerText.includes("Error code")) {
             document.location.href = document.location.href
         }
-        else if (document.body.innerText.includes("设置")) {
+        else if (document.body.innerHTML.includes('a href="/history"')) {
             const c = new Date().getHours()
             if (c > 23 || c < 12) {
                 run()
