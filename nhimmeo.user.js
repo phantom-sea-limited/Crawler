@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      2.2
+// @version      2.2.1
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -542,7 +542,7 @@ function check() {
         if (document.body.innerText.includes("Error code")) {
             document.location.href = document.location.href
         }
-        else if (document.body.innerHTML.includes('a href="/history"')) {
+        else if (document.body.innerHTML.includes('设置') || document.body.innerHTML.includes('a href="/history"')) {
             const c = new Date().getHours()
             if (c > 23 || c < 12) {
                 run()
