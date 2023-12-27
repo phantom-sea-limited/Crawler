@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      2.1.1
+// @version      2.1.2
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
@@ -9,6 +9,7 @@
 // @match        https://zh.nhimmeo.cf/book/*
 // @match        https://wap.ciweimao.com/book/*
 // @match        https://m.sfacg.com/*
+// @match        https://www.qidian.com/book/*
 // @icon         https://api.phantom-sea-limited.ltd/favicon.ico
 // @require      https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.js?v=1.4
 // @require      https://static.sirin.top/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
@@ -116,7 +117,7 @@ class Article {
             if (r.enckey) {
                 log = localStorage.getItem("LOG")
             } else {
-                log = r.data
+                log = r.oridata ?? r.data
             }
             if (log == null) {
                 insert()
@@ -260,7 +261,41 @@ class Article {
         if (this.ori == "ciweimao" && this.more['c'] == undefined) { await c(this) }
         else if (this.ori == "ciweimao") { await c2(this) }
         else if (this.ori == "sfacg") { await sf(this) }
+        else if (this.ori == "qidian") { await this.qidian() }
         else { await fallback(this) }
+    }
+
+    async qidian() {
+        if (document.location.href == `https://www.qidian.com/book/${this.ID}/`) {
+            const all = document.querySelectorAll(".catalog-volume")
+            for (let i = 0; i < all.length; i++) {
+                const html = all[i]
+                const title = html.querySelector(".volume-name").innerText.split("·")[0]
+
+                const chaplist = this.chapterList[i + 1] ?? {
+                    name: title,
+                    lists: {}
+                }
+
+                const chaps = html.querySelectorAll("a.chapter-name")
+                for (let id = 0; id < chaps.length; id++) {
+                    const chap = chaps[id]
+                    const chapid = chap.href.split("/")[5]
+                    const title = chap.innerText
+                    if (chaplist.lists[id] && chaplist.lists[id].name === title) {
+
+                    } else {
+                        chaplist.lists[id] = this.chapterList[0][chapid]
+                        chaplist.lists[id].name = title
+                    }
+                }
+                this.chapterList[i + 1] = chaplist
+            }
+        } else {
+            await Task.add(Task.createBymethod(this.ID, this.ori, "translateCatalog", this.mode), "push")
+            window.Task_STOP = true
+            document.location.href = `https://www.qidian.com/book/${this.ID}/`
+        }
     }
 
     async translateInfo() {
@@ -298,8 +333,6 @@ class Article {
                 content.children[0].remove()
                 if (document.location.hostname == "sangtacviet.com") {
                     FIX_CN()
-                    chap.content = content.innerHTML.replaceAll(" ", "").replaceAll("<br>", "\n").replace("由于版权问题，本源不支持查看原文。", "")
-                        .replaceAll(",", "，").replaceAll(".", "。").replaceAll("?", "？").replaceAll(":", "：").replaceAll("!", "！")
                 } else {
                     chap.content = content.innerHTML.replaceAll("<br>", "\n")
                 }
@@ -721,6 +754,8 @@ function check() {
             run()
         } else if (document.location.hostname == "m.sfacg.com") {
             run()
+        } else if (document.location.hostname == "www.qidian.com") {
+            run()
         }
     } catch {
         setTimeout(check, 2000)
@@ -916,10 +951,6 @@ function add_button() {
         }))
         main.append(create("汉化工具", "fa fa-lightbulb-o", function () {
             FIX_CN()
-            const content = document.getElementsByClassName("contentbox")[1]
-            content.children[0].remove()
-            content.innerHTML = content.innerHTML.replaceAll(" ", "").replace("由于版权问题，本源不支持查看原文。", "")
-                .replaceAll(",", "，").replaceAll(".", "。").replaceAll("?", "？").replaceAll(":", "：").replaceAll("!", "！")
         }))
     }
 }
@@ -1109,4 +1140,10 @@ function FIX_CN() {
             } catch { }
         }
     }
+    const content = document.getElementsByClassName("contentbox")[1]
+    content.children[0].remove()
+
+    content.innerHTML = content.innerHTML.replaceAll(" ", "").replace("由于版权问题，本源不支持查看原文。", "")
+        .replaceAll(",", "，").replaceAll(".", "。").replaceAll("?", "？").replaceAll(":", "：").replaceAll("!", "！")
+        .replaceAll("Vìvấnđềnộidung，nguồnnàykhônghỗtrợxemvănbảngốc。", "")
 }
