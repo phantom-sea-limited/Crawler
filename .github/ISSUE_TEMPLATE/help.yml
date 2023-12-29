@@ -9,18 +9,8 @@ body:
       options:
         - label: 我已经查阅了 https://github.com/phantom-sea-limited/Crawler/issues
           required: true
-        - label: 我正在使用最新版的爬虫
+        - label: 我已经查阅了互联网，但并没有得到解决方案
           required: true
-  - type: dropdown
-    id: type
-    attributes:
-      label: 是什么爬虫引发的问题
-      options:
-        - nhimmeo.user.js
-        - sangtacviet.user.js
-        - 其他
-    validations:
-      required: true
   - type: input
     id: url
     attributes:
