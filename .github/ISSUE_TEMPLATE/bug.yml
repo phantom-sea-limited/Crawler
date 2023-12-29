@@ -9,8 +9,6 @@ body:
       options:
         - label: 我已经查阅了 https://github.com/phantom-sea-limited/Crawler/issues
           required: true
-        - label: I have reviewed the documentation https://docs.sentry.io/
-          required: true
         - label: 我正在使用最新版的爬虫
           required: true
   - type: dropdown
