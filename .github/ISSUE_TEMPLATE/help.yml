@@ -20,16 +20,6 @@ body:
         请尽可能详细描述问题
     validations:
       required: false
-  - type: textarea
-    id: other
-    attributes:
-      label: 其他
-      description: 截图，等等其他不重要的东西
-      placeholder: |-
-        anything
-    validations:
-      required: false
-  - type: markdown
     attributes:
       value: |-
         ## Thanks 🙏
