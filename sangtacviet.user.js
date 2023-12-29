@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      2.1.2
+// @version      2.1.3
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
@@ -333,9 +333,8 @@ class Article {
                 content.children[0].remove()
                 if (document.location.hostname == "sangtacviet.com") {
                     FIX_CN()
-                } else {
-                    chap.content = content.innerHTML.replaceAll("<br>", "\n")
-                }
+                } else { }
+                chap.content = content.innerHTML.replaceAll("<br>", "\n")
             } else {
                 window.Task_STOP = true
                 await sleep(1000)
@@ -1141,8 +1140,11 @@ function FIX_CN() {
         }
     }
     const content = document.getElementsByClassName("contentbox")[1]
-    content.children[0].remove()
 
+    for (const ad of content.querySelectorAll(".ad_content")) {
+        ad.remove()
+    }
+    content.children[0].remove()
     content.innerHTML = content.innerHTML.replaceAll(" ", "").replace("由于版权问题，本源不支持查看原文。", "")
         .replaceAll(",", "，").replaceAll(".", "。").replaceAll("?", "？").replaceAll(":", "：").replaceAll("!", "！")
         .replaceAll("Vìvấnđềnộidung，nguồnnàykhônghỗtrợxemvănbảngốc。", "")
