@@ -1,5 +1,5 @@
-﻿name: 💡请求帮助
-description: 请求帮助
+name: 💡请求帮助
+description: help wanted
 labels: ['help wanted']
 body:
   - type: checkboxes
@@ -9,8 +9,33 @@ body:
       options:
         - label: 我已经查阅了 https://github.com/phantom-sea-limited/Crawler/issues
           required: true
-        - label: 我已经查阅了互联网，但并没有得到解决方案
+        - label: 我正在使用最新版的爬虫
           required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: 是什么爬虫引发的问题
+      options:
+        - nhimmeo.user.js
+        - sangtacviet.user.js
+        - 其他
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: 你在哪个网页遇到的问题
+      description: 问题产生的页面即可
+      placeholder: https://sangtacviet.com
+    validations:
+      required: true
+  - type: input
+    id: framework-version
+    attributes:
+      label: 油猴版本
+      description:
+        非必须，右键管理扩展
+      placeholder: 5.0.0
   - type: textarea
     id: message
     attributes:
@@ -18,6 +43,15 @@ body:
       description: 任何需要的东西请在此添加
       placeholder: |-
         请尽可能详细描述问题
+    validations:
+      required: false
+  - type: textarea
+    id: other
+    attributes:
+      label: 其他
+      description: 截图，等等其他不重要的东西
+      placeholder: |-
+        anything
     validations:
       required: false
   - type: markdown
