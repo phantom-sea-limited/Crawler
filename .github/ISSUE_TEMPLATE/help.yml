@@ -1,5 +1,5 @@
 ﻿name: 💡请求帮助
-description: help wanted
+description: 请求帮助
 labels: ['help wanted']
 body:
   - type: checkboxes
