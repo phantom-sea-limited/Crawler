@@ -1,0 +1,62 @@
+name: 🐞脚本爬虫-错误报告
+description: 报告任何存在的问题
+labels: ['Type: Bug']
+body:
+  - type: checkboxes
+    attributes:
+      label: 是否有已经存在的问题
+      description: 请使用搜索功能查阅是否存在和您一致或相似的问题
+      options:
+        - label: 我已经查阅了 https://github.com/phantom-sea-limited/Crawler/issues
+          required: true
+        - label: I have reviewed the documentation https://docs.sentry.io/
+          required: true
+        - label: 我正在使用最新版的爬虫
+          required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: 是什么爬虫引发的问题
+      options:
+        - nhimmeo.user.js
+        - sangtacviet.user.js
+        - 其他
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: 你在哪个网页遇到的问题
+      description: 问题产生的页面即可
+      placeholder: https://sangtacviet.com
+    validations:
+      required: true
+  - type: input
+    id: framework-version
+    attributes:
+      label: 油猴版本
+      description:
+        非必须，右键管理扩展
+      placeholder: 5.0.0
+  - type: textarea
+    id: message
+    attributes:
+      label: 描述问题
+      description: 任何需要的东西请在此添加
+      placeholder: |-
+        请尽可能详细描述问题
+    validations:
+      required: false
+  - type: textarea
+    id: other
+    attributes:
+      label: 其他
+      description: 截图，等等其他东西
+      placeholder: |-
+        anything
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |-
+        ## Thanks 🙏
