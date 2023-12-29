@@ -1,6 +1,6 @@
-name: 🐞脚本爬虫-错误报告
-description: 报告任何存在的问题
-labels: ['bug']
+﻿name: 💡请求帮助
+description: help wanted
+labels: ['help wanted']
 body:
   - type: checkboxes
     attributes:
@@ -9,33 +9,8 @@ body:
       options:
         - label: 我已经查阅了 https://github.com/phantom-sea-limited/Crawler/issues
           required: true
-        - label: 我正在使用最新版的爬虫
+        - label: 我已经查阅了互联网，但并没有得到解决方案
           required: true
-  - type: dropdown
-    id: type
-    attributes:
-      label: 是什么爬虫引发的问题
-      options:
-        - nhimmeo.user.js
-        - sangtacviet.user.js
-        - 其他
-    validations:
-      required: true
-  - type: input
-    id: url
-    attributes:
-      label: 你在哪个网页遇到的问题
-      description: 问题产生的页面即可
-      placeholder: https://sangtacviet.com
-    validations:
-      required: true
-  - type: input
-    id: framework-version
-    attributes:
-      label: 油猴版本
-      description:
-        非必须，右键管理扩展
-      placeholder: 5.0.0
   - type: textarea
     id: message
     attributes:
