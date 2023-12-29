@@ -11,21 +11,6 @@ body:
           required: true
         - label: 我已经查阅了互联网，但并没有得到解决方案
           required: true
-  - type: input
-    id: url
-    attributes:
-      label: 你在哪个网页遇到的问题
-      description: 问题产生的页面即可
-      placeholder: https://sangtacviet.com
-    validations:
-      required: true
-  - type: input
-    id: framework-version
-    attributes:
-      label: 油猴版本
-      description:
-        非必须，右键管理扩展
-      placeholder: 5.0.0
   - type: textarea
     id: message
     attributes:
