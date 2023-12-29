@@ -20,6 +20,7 @@ body:
         请尽可能详细描述问题
     validations:
       required: false
+  - type: markdown
     attributes:
       value: |-
         ## Thanks 🙏
