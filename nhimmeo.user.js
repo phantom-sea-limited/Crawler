@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      2.2.1
+// @version      2.3
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -149,9 +149,11 @@ class Article {
         if (document.location.href == chap.href) {
             const content = $("article")[0].innerHTML.replaceAll("<br>", "").replaceAll("\x04", "")
             if (content.includes('↻ Loading.')) {
+                window.Task_STOP = true
                 await sleep(1000)
                 return await this.fetchChapter(i, j)
             } else {
+                window.Task_STOP = false
                 chap.content = content
             }
         } else {
@@ -309,8 +311,8 @@ class Task {
                 eval(command)
                 notice.push(command, Notice.DEBUG)
                 Task.localconfig(commands)
-                setTimeout(Task.init, 200)
             }
+            if (commands.length != 0) setTimeout(Task.init, 1000)
         }
         notice.push("Task finish! waiting for another", Notice.INFO)
     }
