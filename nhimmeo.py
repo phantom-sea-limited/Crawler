@@ -53,7 +53,7 @@ else:
                 "lines": []
             }]
             for k in content:
-                k = k.replace('\u3000', " ")
+                k = re.sub(r'[\u0000-\u10FFFF]', " ", k)
                 if "<img" not in k:
                     text[0]['lines'].append({
                         "type": "p",
