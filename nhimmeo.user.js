@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      2.3
+// @version      2.3.1
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -147,7 +147,7 @@ class Article {
         var chap = this.chapterList[i].lists[j]
         if (chap["CanDownload"] == "userchap") { chap.href = chap.href.replace("/chap/", "/shchap/") }
         if (document.location.href == chap.href) {
-            const content = $("article")[0].innerHTML.replaceAll("<br>", "").replaceAll("\x04", "")
+            const content = $("article")[0].innerHTML.replaceAll("<br>", "\n").replaceAll("\x04", "")
             if (content.includes('↻ Loading.')) {
                 window.Task_STOP = true
                 await sleep(1000)
