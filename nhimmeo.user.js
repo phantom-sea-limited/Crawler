@@ -203,15 +203,49 @@ class Article {
         }
     }
 
-    async file() {
-        await this.load()
-        let link = document.createElement('a');
-        link.download = `${this.bookname}.json`;
-        let blob = new Blob([JSON.stringify(this.output())], { type: 'text/json' });
-        link.href = URL.createObjectURL(blob);
-        link.click();
-        URL.revokeObjectURL(link.href);
+async file(exportType = 'json') {
+    await this.load();
+
+    let blob;
+    let fileName;
+
+    if (exportType === 'txt') {
+        const txtContent = this.buildTxtContent(this.output());
+        blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8' });
+        fileName = `${this.bookname}.txt`;
+    } else {
+        const jsonData = JSON.stringify(this.output(), null, 2);
+        blob = new Blob([jsonData], { type: 'application/json;charset=utf-8' });
+        fileName = `${this.bookname}.json`;
     }
+
+    const link = document.createElement('a');
+    link.download = fileName;
+    link.href = URL.createObjectURL(blob);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+}
+
+buildTxtContent(jsonData) {
+    let txtContent = '';
+    txtContent += `书名: ${jsonData.bookname}\n`;
+    txtContent += `作者: ${jsonData.author}\n`;
+    txtContent += `标签: ${jsonData.tag}\n`;
+    txtContent += `更新时间: ${jsonData.book_uptime}\n`;
+    txtContent += `简介: ${jsonData.details}\n\n`;
+
+    jsonData.chapterList.forEach((chapter) => {
+        txtContent += `${chapter.name}\n`;
+        Object.values(chapter.lists).forEach(chap => {
+            txtContent += `  ${chap.name}\n`;
+            txtContent += chap.content ? `    ${chap.content}\n\n` : "    章节内容暂无\n\n";
+        });
+    });
+
+    return txtContent;
+}
 
     async load() {
         if (this.load_status != true) {
@@ -699,6 +733,14 @@ function add_button() {
             var A = new Article(IDs, "async")
             A.file()
         }))
+         main.append(create("导出TXT", "fa-file-text-o", function () {
+            var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/);
+            if (IDs) {
+                IDs = IDs[1];
+                var A = new Article(IDs, "async");
+                A.file('txt');  
+            }
+        }))
         main.append(document.createElement("br"))
         main.append(create("清空高速缓存", "fa-times", function () {
             var book_mark = localStorage.getItem("book_mark")
@@ -727,4 +769,3 @@ GM_registerMenuCommand("终止任务", () => {
     window.Task_info = []
     Task.localconfig([])
 })
-
