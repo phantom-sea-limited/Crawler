@@ -239,14 +239,17 @@ buildTxtContent(jsonData) {
     jsonData.chapterList.forEach((chapter) => {
         txtContent += `${chapter.name}\n`;
         Object.values(chapter.lists).forEach(chap => {
-            txtContent += `  ${chap.name}\n`;
-            txtContent += chap.content ? `    ${chap.content}\n\n` : "    章节内容暂无\n\n";
+            let chapterTitle = chap.CanDownload === false ? `${chap.name} [无正文]` : chap.name;
+            txtContent += `  ${chapterTitle}\n`;
+
+            if (chap.CanDownload !== false && chap.content) {
+                txtContent += `    ${chap.content}\n\n`;
+            }
         });
     });
 
     return txtContent;
 }
-
     async load() {
         if (this.load_status != true) {
             if (this.mode == "normal") {
