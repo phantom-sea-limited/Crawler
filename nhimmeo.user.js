@@ -239,7 +239,12 @@ buildTxtContent(jsonData) {
     jsonData.chapterList.forEach((chapter) => {
         txtContent += `${chapter.name}\n`;
         Object.values(chapter.lists).forEach(chap => {
-            let chapterTitle = chap.CanDownload === false ? `${chap.name} [无正文]` : chap.name;
+            let chapterTitle = chap.name;
+            if (chap.CanDownload === false) {
+                chapterTitle += " [未共享]";
+            } else if (chap.content === "") {
+                chapterTitle += " [无正文]";
+            }
             txtContent += `  ${chapterTitle}\n`;
 
             if (chap.CanDownload !== false && chap.content) {
