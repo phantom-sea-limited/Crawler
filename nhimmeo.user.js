@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      2.3.1
+// @version      2.3.2
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
@@ -203,58 +203,58 @@ class Article {
         }
     }
 
-async file(exportType = 'json') {
-    await this.load();
+    async file(exportType = 'json') {
+        await this.load();
 
-    let blob;
-    let fileName;
+        let blob;
+        let fileName;
 
-    if (exportType === 'txt') {
-        const txtContent = this.buildTxtContent(this.output());
-        blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8' });
-        fileName = `${this.bookname}.txt`;
-    } else {
-        const jsonData = JSON.stringify(this.output(), null, 2);
-        blob = new Blob([jsonData], { type: 'application/json;charset=utf-8' });
-        fileName = `${this.bookname}.json`;
+        if (exportType === 'txt') {
+            const txtContent = this.buildTxtContent(this.output());
+            blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8' });
+            fileName = `${this.bookname}.txt`;
+        } else {
+            const jsonData = JSON.stringify(this.output(), null, 2);
+            blob = new Blob([jsonData], { type: 'application/json;charset=utf-8' });
+            fileName = `${this.bookname}.json`;
+        }
+
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = URL.createObjectURL(blob);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
     }
 
-    const link = document.createElement('a');
-    link.download = fileName;
-    link.href = URL.createObjectURL(blob);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
-}
+    buildTxtContent(jsonData) {
+        let txtContent = '';
+        txtContent += `书名: ${jsonData.bookname}\n`;
+        txtContent += `作者: ${jsonData.author}\n`;
+        txtContent += `标签: ${jsonData.tag}\n`;
+        txtContent += `更新时间: ${jsonData.book_uptime}\n`;
+        txtContent += `简介: ${jsonData.details}\n\n`;
 
-buildTxtContent(jsonData) {
-    let txtContent = '';
-    txtContent += `书名: ${jsonData.bookname}\n`;
-    txtContent += `作者: ${jsonData.author}\n`;
-    txtContent += `标签: ${jsonData.tag}\n`;
-    txtContent += `更新时间: ${jsonData.book_uptime}\n`;
-    txtContent += `简介: ${jsonData.details}\n\n`;
+        jsonData.chapterList.forEach((chapter) => {
+            txtContent += `${chapter.name}\n`;
+            Object.values(chapter.lists).forEach(chap => {
+                let chapterTitle = chap.name;
+                if (chap.CanDownload === false) {
+                    chapterTitle += " [未共享]";
+                } else if (chap.content === "") {
+                    chapterTitle += " [无正文]";
+                }
+                txtContent += `  ${chapterTitle}\n`;
 
-    jsonData.chapterList.forEach((chapter) => {
-        txtContent += `${chapter.name}\n`;
-        Object.values(chapter.lists).forEach(chap => {
-            let chapterTitle = chap.name;
-            if (chap.CanDownload === false) {
-                chapterTitle += " [未共享]";
-            } else if (chap.content === "") {
-                chapterTitle += " [无正文]";
-            }
-            txtContent += `  ${chapterTitle}\n`;
-
-            if (chap.CanDownload !== false && chap.content) {
-                txtContent += `    ${chap.content}\n\n`;
-            }
+                if (chap.CanDownload !== false && chap.content) {
+                    txtContent += `    ${chap.content}\n\n`;
+                }
+            });
         });
-    });
 
-    return txtContent;
-}
+        return txtContent;
+    }
     async load() {
         if (this.load_status != true) {
             if (this.mode == "normal") {
@@ -579,7 +579,7 @@ window.Cloud = Cloud
 //INIT
 setTimeout(installCSS)
 setTimeout(check)
-setTimeout(() => { if (document.readyState != "complete") { document.location.href = document.location.href } }, 15000)
+setTimeout(() => { if (document.readyState != "complete") { document.location.href = document.location.href } }, 60000)
 function check() {
     notice.push("Start checking!", Notice.DEBUG)
     try {
@@ -741,12 +741,12 @@ function add_button() {
             var A = new Article(IDs, "async")
             A.file()
         }))
-         main.append(create("导出TXT", "fa-file-text-o", function () {
+        main.append(create("导出TXT", "fa-file-text-o", function () {
             var IDs = document.location.href.match(/https:\/\/zh\.nhimmeo\.cf\/book\/(\d+)$/);
             if (IDs) {
                 IDs = IDs[1];
                 var A = new Article(IDs, "async");
-                A.file('txt');  
+                A.file('txt');
             }
         }))
         main.append(document.createElement("br"))
