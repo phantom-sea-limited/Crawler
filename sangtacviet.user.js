@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      2.1.3
+// @version      2.1.4
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
@@ -11,7 +11,7 @@
 // @match        https://m.sfacg.com/*
 // @match        https://www.qidian.com/book/*
 // @icon         https://api.phantom-sea-limited.ltd/favicon.ico
-// @require      https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.js?v=1.4
+// @require      https://static.sirin.top/https://raw.githubusercontent.com/mickelsonmichael/js-snackbar/master/dist/js-snackbar.js
 // @require      https://static.sirin.top/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
 // @grant        GM_getValue
 // @grant        GM_setValue
@@ -839,7 +839,7 @@ function insertCSS() {
     if (document.body != undefined) {
         var css = document.createElement("link")
         css.rel = 'stylesheet'
-        css.href = "https://static.sirin.top/https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.css?v=1.4"
+        css.href = "https://static.sirin.top/https://raw.githubusercontent.com/mickelsonmichael/js-snackbar/master/dist/js-snackbar.css"
         document.body.append(css)
         css = document.createElement("style")
         css.innerHTML = `

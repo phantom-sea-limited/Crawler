@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      2.3.2
+// @version      2.3.3
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
 // @require      https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.11.1.min.js
 // @require      https://static.sirin.top/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
-// @require      https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.js?v=1.4
+// @require      https://static.sirin.top/https://raw.githubusercontent.com/mickelsonmichael/js-snackbar/master/dist/js-snackbar.js
 // @icon         https://api.phantom-sea-limited.ltd/favicon.ico
 // @grant        GM_log
 // @grant        unsafeWindow
@@ -614,7 +614,7 @@ function installCSS() {
     if (document.body != undefined) {
         var css = document.createElement("link")
         css.rel = 'stylesheet'
-        css.href = "https://static.sirin.top/https://www.michaelmickelson.com/js-snackbar/dist/js-snackbar.css?v=1.4"
+        css.href = "https://static.sirin.top/https://raw.githubusercontent.com/mickelsonmichael/js-snackbar/master/dist/js-snackbar.css"
         document.body.append(css)
         css = document.createElement("style")
         css.innerHTML = `
