@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      2.1.4
+// @version      2.1.5
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
@@ -10,7 +10,7 @@
 // @match        https://wap.ciweimao.com/book/*
 // @match        https://m.sfacg.com/*
 // @match        https://www.qidian.com/book/*
-// @icon         https://api.phantom-sea-limited.ltd/favicon.ico
+// @icon         https://d.sirin.top/tmp_crop_decode.jpg
 // @require      https://static.sirin.top/https://raw.githubusercontent.com/mickelsonmichael/js-snackbar/master/dist/js-snackbar.js
 // @require      https://static.sirin.top/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
 // @grant        GM_getValue
@@ -291,10 +291,15 @@ class Article {
                 }
                 this.chapterList[i + 1] = chaplist
             }
+            await this.save()
         } else {
             await Task.add(Task.createBymethod(this.ID, this.ori, "translateCatalog", this.mode), "push")
             window.Task_STOP = true
-            document.location.href = `https://www.qidian.com/book/${this.ID}/`
+            window.open(`https://www.qidian.com/book/${this.ID}/`);
+            unsafeWindow.location.href = 'about:blank';
+            unsafeWindow.close();
+            //document.location.href = `https://www.qidian.com/book/${this.ID}/`
+
         }
     }
 
@@ -628,7 +633,7 @@ const Cloud = {
     createUploadSession: (Article) => {
         GM_xmlhttpRequest({
             method: "GET",
-            url: `https://api.phantom-sea-limited.ltd/release/Cloud/upload?gtoken=${Cloud.gtoken}&id=${Article.ID}&source=${Article.ori}`,
+            url: `https://api.sirin.top/release/Cloud/upload?gtoken=${Cloud.gtoken}&id=${Article.ID}&source=${Article.ori}`,
             headers: {
                 "Accept": "text/json"
             },
@@ -645,7 +650,7 @@ const Cloud = {
     fetchlatest: (ID, ori) => {
         GM_xmlhttpRequest({
             method: "GET",
-            url: `https://api.phantom-sea-limited.ltd/release/Cloud/v1/Sangtacviet/download?id=${ID}&source=${ori}`,
+            url: `https://api.sirin.top/release/Cloud/v1/Sangtacviet/download?id=${ID}&source=${ori}`,
             headers: {
                 "Accept": "text/json"
             },
@@ -754,7 +759,11 @@ function check() {
         } else if (document.location.hostname == "m.sfacg.com") {
             run()
         } else if (document.location.hostname == "www.qidian.com") {
-            run()
+            if (document.body.innerHTML.length <= 50) {
+                setTimeout(check, 2000)
+            } else {
+                run()
+            }
         }
     } catch {
         setTimeout(check, 2000)
