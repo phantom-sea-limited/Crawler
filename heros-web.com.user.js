@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         Canvas.Download
 // @namespace    Rcrwrate
-// @version      1.0
+// @version      1.0.1
 // @description  下载章节
 // @author       Rcrwrate
 // @match        https://viewer.heros-web.com/episode/*
-// @icon         https://api.phantom-sea-limited.ltd/favicon.ico
+// @icon         https://jsd.nn.ci/gh/phantom-sea-limited/data@main/tmp_crop_decode.jpg
 // @grant        unsafeWindow
 // @grant        GM_registerMenuCommand
-// @updateURL    https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/heros-web.com.user.js
-// @downloadURL  https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/heros-web.com.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/phantom-sea-limited/Crawler@main/heros-web.com.user.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/phantom-sea-limited/Crawler@main/heros-web.com.user.js
 // @license      MIT
 // ==/UserScript==
 

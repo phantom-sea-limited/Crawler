@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         lightnovel.us下载工具
 // @namespace    Rcrwrate
-// @version      1.0.1
+// @version      1.0.2
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://www.lightnovel.us/*
-// @require      https://static.sirin.top/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
-// @icon         https://api.phantom-sea-limited.ltd/favicon.ico
-// @updateURL    https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/lightnovel.us.user.js
-// @downloadURL  https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/lightnovel.us.user.js
+// @icon         https://jsd.nn.ci/gh/phantom-sea-limited/data@main/tmp_crop_decode.jpg
+// @require      https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
+// @updateURL    https://cdn.jsdelivr.net/gh/phantom-sea-limited/Crawler@main/lightnovel.us.user.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/phantom-sea-limited/Crawler@main/lightnovel.us.user.js
 // @grant        none
 // @license      MIT
 // ==/UserScript==

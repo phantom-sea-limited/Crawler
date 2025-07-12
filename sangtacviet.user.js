@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         STV
 // @namespace    Rcrwrate
-// @version      2.1.5
+// @version      2.1.6
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://sangtacviet.vip/*
@@ -10,9 +10,9 @@
 // @match        https://wap.ciweimao.com/book/*
 // @match        https://m.sfacg.com/*
 // @match        https://www.qidian.com/book/*
-// @icon         https://d.sirin.top/tmp_crop_decode.jpg
-// @require      https://static.sirin.top/https://raw.githubusercontent.com/mickelsonmichael/js-snackbar/master/dist/js-snackbar.js
-// @require      https://static.sirin.top/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
+// @icon         https://jsd.nn.ci/gh/phantom-sea-limited/data@main/tmp_crop_decode.jpg
+// @require      https://cdn.jsdelivr.net/gh/mickelsonmichael/js-snackbar@master/dist/js-snackbar.js
+// @require      https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_deleteValue
@@ -29,8 +29,8 @@
 // @connect      api.phantom-sea-limited.ltd
 // @connect      speed.phantom-sea-limited.ltd
 // @connect      dl.sirin.top
-// @updateURL    https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/sangtacviet.user.js
-// @downloadURL  https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/sangtacviet.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/phantom-sea-limited/Crawler@main/sangtacviet.user.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/phantom-sea-limited/Crawler@main/sangtacviet.user.js
 // @license      MIT
 // ==/UserScript==
 
@@ -848,7 +848,7 @@ function insertCSS() {
     if (document.body != undefined) {
         var css = document.createElement("link")
         css.rel = 'stylesheet'
-        css.href = "https://static.sirin.top/https://raw.githubusercontent.com/mickelsonmichael/js-snackbar/master/dist/js-snackbar.css"
+        css.href = " https://cdn.jsdelivr.net/gh/mickelsonmichael/js-snackbar@master/dist/js-snackbar.css"
         document.body.append(css)
         css = document.createElement("style")
         css.innerHTML = `
@@ -885,7 +885,7 @@ function add_button() {
     var main
     var css = document.createElement("link")
     css.rel = 'stylesheet'
-    css.href = "https://static.sirin.top/https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    css.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     document.body.append(css)
 
     if (IDs != null) {

@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         nhimmeo下载工具
 // @namespace    Rcrwrate
-// @version      2.3.3
+// @version      2.3.4
 // @description  防止防火墙，直接采用前端js进行爬虫
 // @author       Rcrwrate
 // @match        https://zh.nhimmeo.cf/*
 // @require      https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.11.1.min.js
-// @require      https://static.sirin.top/https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
-// @require      https://static.sirin.top/https://raw.githubusercontent.com/mickelsonmichael/js-snackbar/master/dist/js-snackbar.js
-// @icon         https://api.phantom-sea-limited.ltd/favicon.ico
+// @icon         https://jsd.nn.ci/gh/phantom-sea-limited/data@main/tmp_crop_decode.jpg
+// @require      https://cdn.jsdelivr.net/gh/mickelsonmichael/js-snackbar@master/dist/js-snackbar.js
+// @require      https://cdn.jsdelivr.net/gh/mozilla/localForage/dist/localforage.min.js
 // @grant        GM_log
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
@@ -17,8 +17,8 @@
 // @connect      speed.phantom-sea-limited.ltd
 // @connect      dl.sirin.top
 // @run-at       document-body
-// @updateURL    https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/nhimmeo.user.js
-// @downloadURL  https://static.sirin.top/https://github.com/phantom-sea-limited/Crawler/raw/main/nhimmeo.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/phantom-sea-limited/Crawler@main/nhimmeo.user.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/phantom-sea-limited/Crawler@main/nhimmeo.user.js
 // @license      MIT
 // ==/UserScript==
 
@@ -614,7 +614,7 @@ function installCSS() {
     if (document.body != undefined) {
         var css = document.createElement("link")
         css.rel = 'stylesheet'
-        css.href = "https://static.sirin.top/https://raw.githubusercontent.com/mickelsonmichael/js-snackbar/master/dist/js-snackbar.css"
+        css.href = " https://cdn.jsdelivr.net/gh/mickelsonmichael/js-snackbar@master/dist/js-snackbar.css"
         document.body.append(css)
         css = document.createElement("style")
         css.innerHTML = `
